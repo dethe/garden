@@ -235,13 +235,9 @@
 
 			content.style["padding-right"] = 50;
 			content.style.opacity = 0.4;
-			
 
-			ref.child('storylets/'+current).once('value', function(snapshot){
-				content.getElementsByClassName('title')[0].textContent = current;
-				content.getElementsByClassName('text')[0].textContent = snapshot.child('text').val();
-				content.getElementsByClassName('options')[0].innerHTML = "";
-			});
+			content.getElementsByClassName('options')[0].innerHTML = "";
+
 			ref.child('storylets/'+current+'/options').on('child_added', function(snapshot){
 				var element = document.createElement('li');
 				element.textContent = snapshot.val()[0];
@@ -252,7 +248,14 @@
 					update();
 				};
 				content.getElementsByClassName('options')[0].appendChild(element);
-			})
+			});
+
+			ref.child('storylets/'+current).once('value', function(snapshot){
+				content.getElementsByClassName('title')[0].textContent = current;
+				content.getElementsByClassName('text')[0].textContent = snapshot.child('text').val();
+				
+			});
+			
 		}
 
 		ref.child('storylets').on('value', function(snapshot){
