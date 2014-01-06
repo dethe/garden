@@ -1,0 +1,263 @@
+<html>
+<head>
+	<script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
+	<style>
+		@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
+
+		body,html{
+			padding:0px;
+			margin:0px;
+			width:100%;
+			height:100%;
+			
+			font-family:"open sans" sans-serif;
+			font-size:16px;
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+
+			cursor:default;
+		}
+		#content{
+			width:50%;
+			margin:auto;
+			-webkit-transition:all 0.4s;
+			position:relative;
+		}
+		#content div{
+			-webkit-transition:all 0.4s;
+		}
+		#content *{
+			padding:0px;
+			
+		}
+		#content h1{
+			font-weight:300;
+			font-size:50px;
+		}
+		#content p{
+			line-height:2;
+		}
+		#content ul{
+			list-style: none;
+			margin-top:40px;
+		}
+		#content ul li{
+			text-decoration:underline;
+			cursor:pointer;
+			margin:0px;
+			padding-left:40px;
+			-webkit-transition:all 0.2s;
+			border:1px solid rgba(256,256,256,0);
+		}
+		#content ul li:hover{
+			color: #299;
+			padding-left:60px;
+		}
+		#createcontent{
+			margin:auto;
+			width:50%;
+			height:120px;
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+
+			position:relative;
+		}
+		#createcontent div{
+			margin:auto;
+			border-radius:50%;
+			border:1px dashed #999;
+			font-size:50px;
+			text-align:center;
+			-webkit-transition:all 0.4s;
+			font-weight:300;
+			padding-top:15px;
+			width:100px;
+			height:85px;
+			cursor:pointer;
+			line-height: 1.4;
+		}
+		#createcontent div:hover{
+			font-size:100px;
+			width:120px;
+			height:105px;
+			padding-top:5px;
+			padding-bottom:10px;
+			line-height: 1;
+		}
+		input, textarea{
+			width:100%;
+			-webkit-flex:1;
+			font-family:"open sans" sans-serif;
+			outline:none;
+			border-radius:5px;
+			border:1px solid #222;
+			box-shadow:inset 0px 1px 2px rgba(0,0,0,0.2);
+			padding:5px 20px !important;
+			-webkit-transition:box-shadow 0.2s;
+			margin-bottom:10px;
+			line-height:2;
+			font-size:16px;
+		}
+		input:focus, textarea:focus{
+			box-shadow:inset 0px 1px 2px rgba(0,0,0,0.2), inset 0px 0px 5px rgba(34, 170, 170, 0.5);
+		}
+		button{
+			font-size:16px;
+			border-radius:5px;
+			outline:none;
+			font-family:"open sans";
+			border:1px solid #eee;
+			padding:5px 20px !important;
+			margin-bottom:10px;
+			line-height:2;
+			background: #2aa;
+			color:#fff;
+			-webkit-transition:all 0.2s;
+		}
+		button:hover{
+			cursor:pointer;
+			background: #266;
+			border-color:#266;
+		}
+		#storylet_count{
+			position:absolute;
+			top:10px;
+			left:20px;
+		}
+	</style>
+</head>
+<body>
+	<div id="storylet_count"></div>
+	<div id="content">
+		<div>
+			<h1 class="title"></h1>
+			<p class="text"></p>
+			<ul class="options">
+				
+			</ul>
+		</div>
+		<div style="display:none;">
+			<input type="text" style="font-size:30px; font-weight:300" placeholder="Title" />
+			<textarea placeholder="Description" rows="10"></textarea>
+			<button style="float:right">Create Storylet</button>
+		</div>
+	</div>
+	<div id="createcontent" style="opacity:0">
+		<span style="display:none; width:100%; position:absolute; top:30px; opacity:0; -webkit-transition:all 0.4s;"><input type="text" placeholder="Option Name"/><button style="margin-left:20px">Ok</button></span>
+		<div style="display:block; cursor:pointer">+</div>
+	</div>
+	
+	<script>
+		var ref = new Firebase('https://story.firebaseio.com/');
+		var editmode = true;
+
+		var new_storylet = {
+			option: '',
+			title: '',
+			text: '',
+		}
+		
+		var current;
+		ref.child('first').once('value', function(snapshot){
+			if(current === undefined){current = snapshot.val()};
+			update();
+		});
+
+		var createcontent = document.getElementById('createcontent');
+		var content = document.getElementById('content');
+
+		if(editmode){createcontent.style.opacity = 1}
+
+		createcontent.children[1].onclick = function(){
+			createcontent.children[0].style.display = "-webkit-flex";
+			createcontent.children[1].style.opacity = 0;
+			createcontent.children[0].style.opacity = 1;
+			setTimeout(function(){
+				createcontent.children[1].style.display = "none";
+			}, 200);
+			createcontent.children[0].children[0].focus();
+		}
+		createcontent.children[0].getElementsByTagName('button')[0].onclick = function(){
+			var value = createcontent.children[0].getElementsByTagName('input')[0].value;
+			createcontent.children[0].getElementsByTagName('input')[0].value = '';
+			if(value.length > 0){
+				new_storylet.option = value;
+				content.children[0].style.opacity = 0;
+				content.children[0].style.display = 'none';
+				content.children[1].style.opacity = 1;
+				content.children[1].style.display = 'block';
+				createcontent.children[0].style.opacity = 0;
+				setTimeout(function(){
+					createcontent.children[0].style.display = "none";
+				}, 400);
+				content.children[1].children[0].value = '';
+				content.children[1].children[1].value = '';
+				content.children[1].children[0].focus();
+			}
+		}
+
+		content.children[1].children[2].onclick = function(){
+			new_storylet.title = content.children[1].children[0].value;
+			new_storylet.text = content.children[1].children[1].value;
+			
+
+			ref.child('storylets/'+current+'/options').push([new_storylet.option, new_storylet.title])
+
+			ref.child('storylets/'+new_storylet.title).set({
+				"options":[],
+				"text":new_storylet.text
+			})
+
+			update();
+		}
+
+		function update(){
+			createcontent.children[1].style.display = "block";
+			createcontent.children[1].style.opacity = 1;
+			createcontent.children[0].style.opacity = 0;
+
+			content.children[0].style.opacity = 1;
+			content.children[0].style.display = 'block';
+			content.children[1].style.opacity = 0;
+			content.children[1].style.display = 'none';
+
+			setTimeout(function(){
+				createcontent.children[0].style.display = "none";
+				content.style["padding-right"] = 0;
+				content.style.opacity = 1;
+			}, 400)
+
+			content.style["padding-right"] = 50;
+			content.style.opacity = 0.4;
+			
+
+			ref.child('storylets/'+current).once('value', function(snapshot){
+				content.getElementsByClassName('title')[0].textContent = current;
+				content.getElementsByClassName('text')[0].textContent = snapshot.child('text').val();
+				content.getElementsByClassName('options')[0].innerHTML = "";
+			});
+			ref.child('storylets/'+current+'/options').on('child_added', function(snapshot){
+				var element = document.createElement('li');
+				element.textContent = snapshot.val()[0];
+				element.setAttribute('link', snapshot.val()[1]);
+				element.onclick = function(){
+					current = this.getAttribute('link');
+					ref.child('storylets/'+current+'/options').off();
+					update();
+				};
+				content.getElementsByClassName('options')[0].appendChild(element);
+			})
+		}
+
+		ref.child('storylets').on('value', function(snapshot){
+			document.getElementById('storylet_count').textContent = Object.keys(snapshot.val()).length + ' total storylets';
+		})
+	</script>
+</body>
+</html>
