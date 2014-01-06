@@ -74,6 +74,8 @@
 			flex-direction: column;
 
 			position:relative;
+
+			opacity: 0;
 		}
 		#createcontent div{
 			margin:auto;
@@ -98,6 +100,29 @@
 			padding-bottom:10px;
 			line-height: 1;
 		}
+		.create-content-area{
+			display:none; 
+			width:100%; 
+			position:absolute; 
+			top:30px; 
+			opacity:0; 
+			-webkit-transition:all 0.4s;
+			-moz-transition: all 0.4s;
+			-transition: all 0.4s;
+		}
+		.create-new-storylet{
+			display: none;
+		}
+		.new-storylet-text{
+			font-size:30px;
+			font-weight:300;
+		}
+		.new-storylet-description{
+
+		}
+		.create-action{
+			float: right;
+		}
 		input, textarea{
 			width:100%;
 			-webkit-flex: 1;
@@ -111,6 +136,7 @@
 			padding:5px 20px !important;
 			-webkit-transition:box-shadow 0.2s;
 			-moz-transition: box-shadow 0.2s;
+			transition: box-shadow 0.2s;
 			margin-bottom:10px;
 			line-height:2;
 			font-size:16px;
@@ -133,11 +159,22 @@
 			-moz-transition: all 0.2s;
 			transition: all 0.2s;
 		}
+
+		.create-action{
+			margin-left: 20px;
+		}
+
+		.add-action{
+			display:block;
+			cursor:pointer;
+		}
+
 		button:hover{
 			cursor:pointer;
 			background: #266;
 			border-color:#266;
 		}
+
 		#storylet_count{
 			position:absolute;
 			top:10px;
@@ -152,28 +189,35 @@
 			<h1 class="title"></h1>
 			<p class="text"></p>
 			<ul class="options">
-				
 			</ul>
 		</div>
-		<div style="display:none;">
-			<input type="text" style="font-size:30px; font-weight:300" placeholder="Title" />
-			<textarea placeholder="Description" rows="10"></textarea>
-			<button style="float:right">Create Storylet</button>
+		<div class="create-new-storylet">
+			<input class="new-storylet-text" type="text" placeholder="Title" />
+			<textarea class="new-storylet-description" placeholder="Description" rows="10"></textarea>
+			<button class="create-action">Create Storylet</button>
 		</div>
 	</div>
-	<div id="createcontent" style="opacity:0">
-		<span style="display:none; width:100%; position:absolute; top:30px; opacity:0; -webkit-transition:all 0.4s;"><input type="text" placeholder="Option Name"/><button style="margin-left:20px">Ok</button></span>
-		<div style="display:block; cursor:pointer">+</div>
+	<div id="createcontent">
+		<span class="create-content-area"><input type="text" placeholder="Option Name"/><button class="create-action">Ok</button></span>
+		<div class="add-action">+</div>
 	</div>
 	
 	<script>
+		// Some suggested refactorings
+		// √ 1. Move all CSS properties out of style="" attributes into classes in stylesheet
+		// 2. Move all CSS properties our of javascript and into classes in stylesheet
+		// 3. Move DOM finding elements into querySelector or querySelectorAll
+		// 4. Save variables for commonly used DOM elements
+		// 5. Instead of anonymous functions for events, use named, reusable functions
+		// 6. Use classes instead of ids in CSS
+		// 7. Use classes instead of descendant selectors like #someid div
 		var ref = new Firebase('https://story.firebaseio.com/');
 		var editmode = true;
 
 		var new_storylet = {
 			option: '',
 			title: '',
-			text: '',
+			text: ''
 		}
 		
 		var current;
