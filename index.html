@@ -1,6 +1,7 @@
 <html>
 <head>
 	<script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
+	<script type='text/javascript' src='prefixfree.min.js'></script>
 	<style>
 		@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
 
@@ -16,8 +17,6 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			-webkit-flex-direction: column;
-			-moz-flex-direction: column;
 			flex-direction: column;
 
 			cursor:default;
@@ -25,14 +24,11 @@
 		#content{
 			width:50%;
 			margin:auto;
-			-webkit-transition: all 0.4s;
-			-moz-transition: all 0.4s;
 			transition: all 0.4s;
 			position: relative;
 		}
 		#content div{
-			-webkit-transition: all 0.4s;
-			-moz-transition: all 0.4s;
+			transition: all 0.4s;
 		}
 		#content *{
 			padding: 0px;
@@ -54,8 +50,6 @@
 			cursor:pointer;
 			margin:0px;
 			padding-left:40px;
-			-webkit-transition:all 0.2s;
-			-moz-transition: all 0.2s;
 			transition: all 0.2s;
 			border:1px solid rgba(256,256,256,0);
 		}
@@ -81,8 +75,7 @@
 			border:1px dashed #999;
 			font-size:50px;
 			text-align:center;
-			-webkit-transition:all 0.4s;
-			-moz-transition: all -.4s;
+			transition: all 0.4s;
 			font-weight:300;
 			padding-top:15px;
 			width:100px;
@@ -100,8 +93,6 @@
 		}
 		input, textarea{
 			width:100%;
-			-webkit-flex: 1;
-			-moz-flex: 1;
 			flex: 1;
 			font-family:"open sans", sans-serif;
 			outline:none;
@@ -109,14 +100,13 @@
 			border:1px solid #222;
 			box-shadow:inset 0px 1px 2px rgba(0,0,0,0.2);
 			padding:5px 20px !important;
-			-webkit-transition:box-shadow 0.2s;
-			-moz-transition: box-shadow 0.2s;
+			transition: box-shadow 0.2s;
 			margin-bottom:10px;
 			line-height:2;
 			font-size:16px;
 		}
 		input:focus, textarea:focus{
-			box-shadow:inset 0px 1px 2px rgba(0,0,0,0.2), inset 0px 0px 5px rgba(34, 170, 170, 0.5);
+			box-shadow:inset 0px 1px 2px rgba(0,0,0,0.2), 0px 0px 5px rgba(34, 170, 170, 0.5);
 		}
 		button{
 			font-size:16px;
@@ -129,8 +119,6 @@
 			line-height:2;
 			background: #2aa;
 			color:#fff;
-			-webkit-transition: all 0.2s;
-			-moz-transition: all 0.2s;
 			transition: all 0.2s;
 		}
 		button:hover{
@@ -165,7 +153,6 @@
 		<span style="display:none; width:100%; position:absolute; top:30px; opacity:0; -webkit-transition:all 0.4s;"><input type="text" placeholder="Option Name"/><button style="margin-left:20px">Ok</button></span>
 		<div style="display:block; cursor:pointer">+</div>
 	</div>
-	
 	<script>
 		var ref = new Firebase('https://story.firebaseio.com/');
 		var editmode = true;
