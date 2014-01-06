@@ -238,13 +238,14 @@
 
 			content.getElementsByClassName('options')[0].innerHTML = "";
 
+			ref.child('storylets/'+current+'/options').off();
 			ref.child('storylets/'+current+'/options').on('child_added', function(snapshot){
 				var element = document.createElement('li');
 				element.textContent = snapshot.val()[0];
 				element.setAttribute('link', snapshot.val()[1]);
 				element.onclick = function(){
-					current = this.getAttribute('link');
 					ref.child('storylets/'+current+'/options').off();
+					current = this.getAttribute('link');
 					update();
 				};
 				content.getElementsByClassName('options')[0].appendChild(element);
