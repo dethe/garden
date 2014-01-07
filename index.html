@@ -57,7 +57,7 @@
 			color: #299;
 			padding-left:60px;
 		}
-		#createcontent{
+		#create-content{
 			margin:auto;
 			width:50%;
 			height:120px;
@@ -71,7 +71,7 @@
 
 			opacity: 0;
 		}
-		#createcontent div{
+		#create-content div{
 			margin:auto;
 			border-radius:50%;
 			border:1px dashed #999;
@@ -85,7 +85,7 @@
 			cursor:pointer;
 			line-height: 1.4;
 		}
-		#createcontent div:hover{
+		#create-content div:hover{
 			font-size:100px;
 			width:120px;
 			height:105px;
@@ -93,6 +93,11 @@
 			padding-bottom:10px;
 			line-height: 1;
 		}
+
+		#create-content.show{
+			opacity: 1;
+		}
+
 		.create-content-area{
 			display:none; 
 			width:100%; 
@@ -103,14 +108,14 @@
 			-moz-transition: all 0.4s;
 			-transition: all 0.4s;
 		}
-		.create-new-storylet{
+		.create-storylet{
 			display: none;
 		}
-		.new-storylet-text{
+		.create-title{
 			font-size:30px;
 			font-weight:300;
 		}
-		.new-storylet-description{
+		.create-description{
 
 		}
 		.create-action{
@@ -162,7 +167,7 @@
 			border-color:#266;
 		}
 
-		#storylet_count{
+		#storylet-count{
 			position:absolute;
 			top:10px;
 			left:20px;
@@ -170,22 +175,25 @@
 	</style>
 </head>
 <body>
-	<div id="storylet_count"></div>
+	<div id="storylet-count"></div>
 	<div id="content">
-		<div>
+		<div class="show-storylet">
 			<h1 class="title"></h1>
-			<p class="text"></p>
+			<p class="description"></p>
 			<ul class="options">
 			</ul>
 		</div>
-		<div class="create-new-storylet">
-			<input class="new-storylet-text" type="text" placeholder="Title" />
-			<textarea class="new-storylet-description" placeholder="Description" rows="10"></textarea>
-			<button class="create-action">Create Storylet</button>
+		<div class="create-storylet">
+			<input class="create-title" type="text" placeholder="Title" />
+			<textarea class="create-description" placeholder="Description" rows="10"></textarea>
+			<button class="create-storylet-action">Create Storylet</button>
 		</div>
 	</div>
-	<div id="createcontent">
-		<span class="create-content-area"><input type="text" placeholder="Option Name"/><button class="create-action">Ok</button></span>
+	<div id="create-content">
+		<span class="create-content-area">
+			<input class="create-option" type="text" placeholder="Option Name"/>
+			<button class="create-option-action">Ok</button>
+		</span>
 		<div class="add-action">+</div>
 	</div>
 	<script>
@@ -212,42 +220,63 @@
 			update();
 		});
 
-		var createcontent = document.getElementById('createcontent');
+		var createContent = document.getElementById('create-content');
+		var createContentArea = document.querySelector('.create-content-area');
+		var createOption = document.querySelector('.create-option');
 		var content = document.getElementById('content');
+		var addAction = document.querySelector('.add-action');
+		var createStoryletAction = document.querySelector('.create-storylet-action');
+		var showStorylet = document.querySelector('.show-storylet');
+		var createOptionAction = document.querySelector('.create-option-action');
+		var createTitle = document.querySelector('.create-title');
+		var createDescription = document.querySelector('.create-description');
+		var createStorylet = document.querySelector('.create-storylet');
+		var title = document.querySelector('.title');
+		var description = document.querySelector('.description');
+		var options = document.querySelector('.options');
+		var storyletCount = document.querySelector('#storylet-count');
 
-		if(editmode){createcontent.style.opacity = 1}
-
-		createcontent.children[1].onclick = function(){
-			createcontent.children[0].style.display = "-webkit-flex";
-			createcontent.children[1].style.opacity = 0;
-			createcontent.children[0].style.opacity = 1;
-			setTimeout(function(){
-				createcontent.children[1].style.display = "none";
-			}, 200);
-			createcontent.children[0].children[0].focus();
+		if(editmode){
+			createContent.classList.add('show');
 		}
-		createcontent.children[0].getElementsByTagName('button')[0].onclick = function(){
-			var value = createcontent.children[0].getElementsByTagName('input')[0].value;
-			createcontent.children[0].getElementsByTagName('input')[0].value = '';
+
+		addAction.addEventListener('click', addNewStorylet, false);
+
+		function addNewStorylet(evt){
+			console.log('addNewStorylet');
+			createContentArea.style.display = "flex";
+			addAction.style.opacity = 0;
+			createContentArea.style.opacity = 1;
+			setTimeout(function(){
+				addAction.style.display = "none";
+			}, 200);
+			createContentArea.children[0].focus();
+		}
+
+		createStoryletAction.onclick = function(){
+			console.log('createStoryletAction');
+			var value = createOption.value;
+			createOption.value = '';
 			if(value.length > 0){
 				new_storylet.option = value;
-				content.children[0].style.opacity = 0;
-				content.children[0].style.display = 'none';
-				content.children[1].style.opacity = 1;
-				content.children[1].style.display = 'block';
-				createcontent.children[0].style.opacity = 0;
+				showStorylet.style.opacity = 0;
+				showStorylet.style.display = 'none';
+				createStorylet.style.opacity = 1;
+				createStorylet.style.display = 'block';
+				createContent.children[0].style.opacity = 0;
 				setTimeout(function(){
-					createcontent.children[0].style.display = "none";
+					createContent.children[0].style.display = "none";
 				}, 400);
-				content.children[1].children[0].value = '';
-				content.children[1].children[1].value = '';
-				content.children[1].children[0].focus();
+				createTitle.value = '';
+				createDescription.value = '';
+				createTitle.focus();
 			}
 		}
 
-		content.children[1].children[2].onclick = function(){
-			new_storylet.title = content.children[1].children[0].value;
-			new_storylet.text = content.children[1].children[1].value;
+		createOptionAction.onclick = function(){
+			console.log('createOptionAction');
+			new_storylet.title = createTitle.value;
+			new_storylet.text = createDescription.value;
 			
 
 			ref.child('storylets/'+current+'/options').push([new_storylet.option, new_storylet.title])
@@ -261,49 +290,50 @@
 		}
 
 		function update(){
-			createcontent.children[1].style.display = "block";
-			createcontent.children[1].style.opacity = 1;
-			createcontent.children[0].style.opacity = 0;
+			addAction.style.display = "block";
+			addAction.style.opacity = 1;
+			createContentArea.style.opacity = 0;
 
-			content.children[0].style.opacity = 1;
-			content.children[0].style.display = 'block';
-			content.children[1].style.opacity = 0;
-			content.children[1].style.display = 'none';
+			showStorylet.style.opacity = 1;
+			showStorylet.style.display = 'block';
+			createStorylet.style.opacity = 0;
+			createStorylet.style.display = 'none';
 
 			setTimeout(function(){
-				createcontent.children[0].style.display = "none";
-				content.style["padding-right"] = 0;
+				createContentArea.style.display = "none";
+				content.style.paddingRight = 0;
 				content.style.opacity = 1;
 			}, 400)
 
-			content.style["padding-right"] = 50;
+			content.style.paddingRight = 50;
 			content.style.opacity = 0.4;
 
-			content.getElementsByClassName('options')[0].innerHTML = "";
+			options.innerHTML = "";
 
 			ref.child('storylets/'+current+'/options').off();
 			ref.child('storylets/'+current+'/options').on('child_added', function(snapshot){
 				var element = document.createElement('li');
-				element.textContent = snapshot.val()[0];
-				element.setAttribute('link', snapshot.val()[1]);
-				element.onclick = function(){
+				var a = document.createElement('a');
+				element.appendChild(a);
+				a.textContent = snapshot.val()[0];
+				a.setAttribute('href', snapshot.val()[1]);
+				a.onclick = function(evt){
+					evt.preventDefault();
 					ref.child('storylets/'+current+'/options').off();
-					current = this.getAttribute('link');
+					current = a.getAttribute('href');
 					update();
 				};
-				content.getElementsByClassName('options')[0].appendChild(element);
+				options.appendChild(element);
 			});
 
 			ref.child('storylets/'+current).once('value', function(snapshot){
-				content.getElementsByClassName('title')[0].textContent = current;
-				content.getElementsByClassName('text')[0].textContent = snapshot.child('text').val();
-				
+				title.textContent = current;
+				description.textContent = snapshot.child('text').val();
 			});
-			
 		}
 
 		ref.child('storylets').on('value', function(snapshot){
-			document.getElementById('storylet_count').textContent = Object.keys(snapshot.val()).length + ' total storylets';
+			storyletCount.textContent = Object.keys(snapshot.val()).length + ' total storylets';
 		})
 	</script>
 </body>
