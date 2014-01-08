@@ -1,0 +1,17 @@
+{
+	"storylets":{
+		"A Crowded Street":{
+			"text":"A busy thoroughfare, lined with shops, markets, and cafes. People are rushing to and fro on their errands. Motorists speed by, occasionally honking. You have only just woken up and have to push through the crowd to get where you are going.",
+			"options":[
+				["Take a shortcut through a dark alley", "A Dark Alley"]
+			]
+		},
+		"A Dark Alley":{
+			"text": "It is desolate and filthy, but at least less crowded. Going further down this way doesn't seem like a good idea, though.",
+			"options": [
+				["Go back to the main street", "A Crowded Street"]
+			]
+		}
+	},
+	"first":"A Crowded Street"
+}
