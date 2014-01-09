@@ -21,31 +21,31 @@
 
 			cursor:default;
 		}
-		#content{
+		.content{
 			width:50%;
 			margin:auto;
 			transition: all 0.4s;
 			position: relative;
 		}
-		#content div{
+		.content div{
 			transition: all 0.4s;
 		}
-		#content *{
+		.content *{
 			padding: 0px;
 			
 		}
-		#content h1{
+		h1{
 			font-weight: 300;
 			font-size: 50px;
 		}
-		#content p{
+		p{
 			line-height:2;
 		}
-		#content ul{
+		ul{
 			list-style: none;
 			margin-top:40px;
 		}
-		#content ul li{
+		li{
 			text-decoration:underline;
 			cursor:pointer;
 			margin:0px;
@@ -53,11 +53,11 @@
 			transition: all 0.2s;
 			border:1px solid rgba(256,256,256,0);
 		}
-		#content ul li:hover{
+		li:hover{
 			color: #299;
 			padding-left:60px;
 		}
-		#create-content{
+		.create-content{
 			margin:auto;
 			width:50%;
 			height:120px;
@@ -69,9 +69,8 @@
 
 			position:relative;
 
-			opacity: 0;
 		}
-		#create-content div{
+		.add-action{
 			margin:auto;
 			border-radius:50%;
 			border:1px dashed #999;
@@ -85,7 +84,7 @@
 			cursor:pointer;
 			line-height: 1.4;
 		}
-		#create-content div:hover{
+		.create-content div:hover{
 			font-size:100px;
 			width:120px;
 			height:105px;
@@ -94,22 +93,16 @@
 			line-height: 1;
 		}
 
-		#create-content.show{
-			opacity: 1;
+		.hide{
+			opacity: 0;
+			display: none;
 		}
 
 		.create-content-area{
-			display:none; 
 			width:100%; 
 			position:absolute; 
 			top:30px; 
-			opacity:0; 
-			-webkit-transition:all 0.4s;
-			-moz-transition: all 0.4s;
-			-transition: all 0.4s;
-		}
-		.create-storylet{
-			display: none;
+			transition: all 0.4s;
 		}
 		.create-title{
 			font-size:30px;
@@ -167,7 +160,7 @@
 			border-color:#266;
 		}
 
-		#storylet-count{
+		.storylet-count{
 			position:absolute;
 			top:10px;
 			left:20px;
@@ -175,38 +168,38 @@
 	</style>
 </head>
 <body>
-	<div id="storylet-count"></div>
-	<div id="content">
+	<div class="storylet-count"></div>
+	<div class="content">
 		<div class="show-storylet">
 			<h1 class="title"></h1>
 			<p class="description"></p>
 			<ul class="options">
 			</ul>
+			<div class="add-action">+</div>
 		</div>
-		<div class="create-storylet">
-			<input class="create-title" type="text" placeholder="Title" />
+		<div class="create-storylet hide">
+			<input class="create-title" placeholder="Title" />
 			<textarea class="create-description" placeholder="Description" rows="10"></textarea>
-			<button class="create-storylet-action">Create Storylet</button>
+			<button class="create-option-action">Create Storylet</button>
 		</div>
-	</div>
-	<div id="create-content">
-		<span class="create-content-area">
-			<input class="create-option" type="text" placeholder="Option Name"/>
-			<button class="create-option-action">Ok</button>
-		</span>
-		<div class="add-action">+</div>
+		<div class="create-content hide">
+			<span class="create-content-area">
+				<input class="create-option" type="text" placeholder="Option Name"/>
+				<button class="create-storylet-action">Ok</button>
+			</span>
+		</div>
 	</div>
 	<script>
 		// Some suggested refactorings
 		// √ 1. Move all CSS properties out of style="" attributes into classes in stylesheet
-		// 2. Move all CSS properties our of javascript and into classes in stylesheet
-		// 3. Move DOM finding elements into querySelector or querySelectorAll
-		// 4. Save variables for commonly used DOM elements
+		// √ 2. Move all CSS properties our of javascript and into classes in stylesheet
+		// √ 3. Move DOM finding elements into querySelector or querySelectorAll
+		// √ 4. Save variables for commonly used DOM elements
 		// 5. Instead of anonymous functions for events, use named, reusable functions
-		// 6. Use classes instead of ids in CSS
+		// √ 6. Use classes instead of ids in CSS
 		// 7. Use classes instead of descendant selectors like #someid div
-		var ref = new Firebase('https://story.firebaseio.com/');
-		var editmode = true;
+		var ref = new Firebase('https://dethestory.firebaseio.com/');
+		var editmode = true; // show the plus button?
 
 		var new_storylet = {
 			option: '',
@@ -215,15 +208,16 @@
 		}
 		
 		var current;
+
 		ref.child('first').once('value', function(snapshot){
 			if(current === undefined){current = snapshot.val()};
 			update();
 		});
 
-		var createContent = document.getElementById('create-content');
+		var createContent = document.querySelector('.create-content');
 		var createContentArea = document.querySelector('.create-content-area');
 		var createOption = document.querySelector('.create-option');
-		var content = document.getElementById('content');
+		var content = document.querySelector('.content');
 		var addAction = document.querySelector('.add-action');
 		var createStoryletAction = document.querySelector('.create-storylet-action');
 		var showStorylet = document.querySelector('.show-storylet');
@@ -234,39 +228,27 @@
 		var title = document.querySelector('.title');
 		var description = document.querySelector('.description');
 		var options = document.querySelector('.options');
-		var storyletCount = document.querySelector('#storylet-count');
+		var storyletCount = document.querySelector('.storylet-count');
 
-		if(editmode){
-			createContent.classList.add('show');
-		}
+		// if(editmode){
+		// 	createContent.classList.remove('hide');
+		// }
 
-		addAction.addEventListener('click', addNewStorylet, false);
+		addAction.addEventListener('click', addActionHandler, false);
 
-		function addNewStorylet(evt){
-			console.log('addNewStorylet');
-			createContentArea.style.display = "flex";
-			addAction.style.opacity = 0;
-			createContentArea.style.opacity = 1;
-			setTimeout(function(){
-				addAction.style.display = "none";
-			}, 200);
-			createContentArea.children[0].focus();
+		function addActionHandler(evt){
+			showStorylet.classList.add('hide');
+			createContent.classList.remove('hide');
+			createOption.focus();
 		}
 
 		createStoryletAction.onclick = function(){
-			console.log('createStoryletAction');
 			var value = createOption.value;
 			createOption.value = '';
 			if(value.length > 0){
 				new_storylet.option = value;
-				showStorylet.style.opacity = 0;
-				showStorylet.style.display = 'none';
-				createStorylet.style.opacity = 1;
-				createStorylet.style.display = 'block';
-				createContent.children[0].style.opacity = 0;
-				setTimeout(function(){
-					createContent.children[0].style.display = "none";
-				}, 400);
+				createContent.classList.add('hide');
+				createStorylet.classList.remove('hide');
 				createTitle.value = '';
 				createDescription.value = '';
 				createTitle.focus();
@@ -274,11 +256,10 @@
 		}
 
 		createOptionAction.onclick = function(){
-			console.log('createOptionAction');
 			new_storylet.title = createTitle.value;
 			new_storylet.text = createDescription.value;
-			
-
+			createStorylet.classList.add('hide');
+			showStorylet.classList.remove('hide');
 			ref.child('storylets/'+current+'/options').push([new_storylet.option, new_storylet.title])
 
 			ref.child('storylets/'+new_storylet.title).set({
@@ -290,23 +271,6 @@
 		}
 
 		function update(){
-			addAction.style.display = "block";
-			addAction.style.opacity = 1;
-			createContentArea.style.opacity = 0;
-
-			showStorylet.style.opacity = 1;
-			showStorylet.style.display = 'block';
-			createStorylet.style.opacity = 0;
-			createStorylet.style.display = 'none';
-
-			setTimeout(function(){
-				createContentArea.style.display = "none";
-				content.style.paddingRight = 0;
-				content.style.opacity = 1;
-			}, 400)
-
-			content.style.paddingRight = 50;
-			content.style.opacity = 0.4;
 
 			options.innerHTML = "";
 
