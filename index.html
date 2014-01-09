@@ -5,9 +5,10 @@
 	<style>
 		@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
 
+		/* Basic style reset */
 		body,html{
-			padding:0px;
-			margin:0px;
+			padding:0;
+			margin:0;
 			width:100%;
 			height:100%;
 			
@@ -21,19 +22,7 @@
 
 			cursor:default;
 		}
-		.content{
-			width:50%;
-			margin:auto;
-			transition: all 0.4s;
-			position: relative;
-		}
-		.content div{
-			transition: all 0.4s;
-		}
-		.content *{
-			padding: 0px;
-			
-		}
+
 		h1{
 			font-weight: 300;
 			font-size: 50px;
@@ -55,7 +44,21 @@
 		}
 		li:hover{
 			color: #299;
-			padding-left:60px;
+			background-color: #FFDC00;
+		}
+
+		.content{
+			width:50%;
+			margin:auto;
+			transition: all 0.4s;
+			position: relative;
+		}
+		.content div{
+			transition: all 0.4s;
+		}
+		.content *{
+			padding: 0px;
+			
 		}
 		.create-content{
 			margin:auto;
@@ -84,7 +87,7 @@
 			cursor:pointer;
 			line-height: 1.4;
 		}
-		.create-content div:hover{
+		.add-action:hover{
 			font-size:100px;
 			width:120px;
 			height:105px;
@@ -100,7 +103,6 @@
 
 		.create-content-area{
 			width:100%; 
-			position:absolute; 
 			top:30px; 
 			transition: all 0.4s;
 		}
@@ -214,20 +216,25 @@
 			update();
 		});
 
-		var createContent = document.querySelector('.create-content');
-		var createContentArea = document.querySelector('.create-content-area');
-		var createOption = document.querySelector('.create-option');
-		var content = document.querySelector('.content');
-		var addAction = document.querySelector('.add-action');
-		var createStoryletAction = document.querySelector('.create-storylet-action');
+		// Components of the default view
 		var showStorylet = document.querySelector('.show-storylet');
-		var createOptionAction = document.querySelector('.create-option-action');
-		var createTitle = document.querySelector('.create-title');
-		var createDescription = document.querySelector('.create-description');
-		var createStorylet = document.querySelector('.create-storylet');
 		var title = document.querySelector('.title');
 		var description = document.querySelector('.description');
 		var options = document.querySelector('.options');
+		var addAction = document.querySelector('.add-action');
+
+		// Components for adding a new option
+		var createContent = document.querySelector('.create-content');
+		var createOption = document.querySelector('.create-option');
+		var createStoryletAction = document.querySelector('.create-storylet-action');
+
+		// Components for filling in the new option page
+		var createStorylet = document.querySelector('.create-storylet');
+		var createTitle = document.querySelector('.create-title');
+		var createDescription = document.querySelector('.create-description');
+		var createOptionAction = document.querySelector('.create-option-action');
+
+		// This is always shown
 		var storyletCount = document.querySelector('.storylet-count');
 
 		// if(editmode){
@@ -237,8 +244,9 @@
 		addAction.addEventListener('click', addActionHandler, false);
 
 		function addActionHandler(evt){
-			showStorylet.classList.add('hide');
+			// showStorylet.classList.add('hide');
 			createContent.classList.remove('hide');
+			addAction.classList.add('hide');
 			createOption.focus();
 		}
 
@@ -248,6 +256,8 @@
 			if(value.length > 0){
 				new_storylet.option = value;
 				createContent.classList.add('hide');
+				showStorylet.classList.add('hide');
+				addAction.classList.remove('hide');
 				createStorylet.classList.remove('hide');
 				createTitle.value = '';
 				createDescription.value = '';
