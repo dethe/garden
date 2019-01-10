@@ -1,6 +1,12 @@
 <html>
 <head>
-	<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+	<!--script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+	<!-- Firebase App is always required and must be first -->
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+
+	<!-- Add additional services that you want to use -->
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-database.js"></script>
 	<script>
 	  // Initialize Firebase
 	  var config = {
@@ -11,14 +17,9 @@
 	    storageBucket: "garden-a048e.appspot.com",
 	    messagingSenderId: "140966453678"
 	  };
-	  firebase.initializeApp(config);
+	 firebase.initializeApp(config);
+         let database = firebase.database();
 	</script>
-	<!-- Firebase App is always required and must be first -->
-	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
-
-	<!-- Add additional services that you want to use -->
-	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-database.js"></script>
 
 	<script type='text/javascript' src='prefixfree.min.js'></script>
 	<link href="style.css" ref="stylesheet" />
