@@ -17,7 +17,7 @@
 		
 		var current;
 
-		ref.child('first').once('value', function(snapshot){
+		database.ref('first').once('value', function(snapshot){
 			if(current === undefined){current = snapshot.val()};
 			update();
 		});
@@ -76,9 +76,9 @@
 			new_storylet.text = createDescription.value;
 			createStorylet.classList.add('hide');
 			showStorylet.classList.remove('hide');
-			ref.child('storylets/'+current+'/options').push([new_storylet.option, new_storylet.title])
+			database.ref('storylets/'+current+'/options').push([new_storylet.option, new_storylet.title])
 
-			ref.child('storylets/'+new_storylet.title).set({
+			database.ref('storylets/'+new_storylet.title).set({
 				"options":[],
 				"text":new_storylet.text
 			})
@@ -90,8 +90,8 @@
 
 			options.innerHTML = "";
 
-			ref.child('storylets/'+current+'/options').off();
-			ref.child('storylets/'+current+'/options').on('child_added', function(snapshot){
+			database.ref('storylets/'+current+'/options').off();
+			database.ref('storylets/'+current+'/options').on('child_added', function(snapshot){
 				var element = document.createElement('li');
 				var a = document.createElement('a');
 				element.appendChild(a);
@@ -99,19 +99,19 @@
 				a.setAttribute('href', snapshot.val()[1]);
 				a.onclick = function(evt){
 					evt.preventDefault();
-					ref.child('storylets/'+current+'/options').off();
+					database.ref('storylets/'+current+'/options').off();
 					current = a.getAttribute('href');
 					update();
 				};
 				options.appendChild(element);
 			});
 
-			ref.child('storylets/'+current).once('value', function(snapshot){
+			database.ref('storylets/'+current).once('value', function(snapshot){
 				title.textContent = current;
 				description.textContent = snapshot.child('text').val();
 			});
 		}
 
-		ref.child('storylets').on('value', function(snapshot){
+		database.ref('storylets').on('value', function(snapshot){
 			storyletCount.textContent = Object.keys(snapshot.val()).length + ' total storylets';
 		})
