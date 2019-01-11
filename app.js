@@ -112,5 +112,6 @@
 		}
 
 		database.ref('storylets').on('value', function(snapshot){
+			console.log('snapshot: %s', snapshot);
 			storyletCount.textContent = Object.keys(snapshot.val()).length + ' total storylets';
 		})
