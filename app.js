@@ -6,7 +6,6 @@
 		// 5. Instead of anonymous functions for events, use named, reusable functions
 		// √ 6. Use classes instead of ids in CSS
 		// 7. Use classes instead of descendant selectors like #someid div
-		var ref = new Firebase('https://dethestory.firebaseio.com/');
 		var editmode = true; // show the plus button?
 
 		var new_storylet = {
