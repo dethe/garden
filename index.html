@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Garden of Forking Paths</title>
-	<link rel="stylesheet" href="css/awsm-2.1.0.css" />
-	<link rel="stylesheet" href="css/app.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Garden of Forking Paths</title>
+  <link rel="stylesheet" href="css/awsm-2.1.0.css" />
+  <link rel="stylesheet" href="css/app.css" />
   <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/webrtc.js"></script>
+  <script src="trix.js"></script>
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=blissfuljs"></script>
+  <script src="blis.js"></script>
   <script>
-    // your code here
+        var gun = Gun(['http://localhost:8765/gun', 'https://gunjs.herokuapp.com/gun']);
   </script>
 </head>
 <body>
