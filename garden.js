@@ -3,12 +3,12 @@
     var user = gun.user();
 
     $('#up')._.bind('click', function(e){
-      user.create($('#alias').val(), $('#pass').val());
+      user.create($('#alias').value, $('#pass').value);
     });
 
     $('#sign')._.bind('submit', function(e){
       e.preventDefault();
-      user.auth($('#alias').val(), $('#pass').val());
+      user.auth(, $('#pass').value);
     });
 
     gun.on('auth', function(){
