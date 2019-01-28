@@ -8,7 +8,7 @@
 
     $('#sign')._.bind('submit', function(e){
       e.preventDefault();
-      user.auth(, $('#pass').value);
+      user.auth($('#alias').value, $('#pass').value);
     });
 
     gun.on('auth', function(){
