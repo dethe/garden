@@ -1,5 +1,21 @@
       var gun = GUN(['http://localhost:8080/gun', 'https://gunjs.herokuapp.com/gun']);
 
+    var user = gun.user();
+
+    $('#up')._.bind('click', function(e){
+      user.create($('#alias').val(), $('#pass').val());
+    });
+
+    $('#sign')._.bind('submit', function(e){
+      e.preventDefault();
+      user.auth($('#alias').val(), $('#pass').val());
+    });
+
+    gun.on('auth', function(){
+      $('#sign').setAttribute('hidden', 'hidden');
+//       user.get('said').map().once(UI);
+    });
+
       var todos = gun.get('garden-xyzzy-todo')
 
       $('form')._.bind('submit', function (event) {
