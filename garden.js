@@ -11,19 +11,33 @@
       user.auth($('#alias').value, $('#pass').value);
     });
 
+    let worlds;
+    let world_list = $('#world_list');
     gun.on('auth', function(){
       $('#sign').setAttribute('hidden', 'hidden');
+         worlds = gun.get('garden-xyzzy-worlds');
+         worlds.map().on(function (world, id){
+           var li = $('#' + id);
+           if (!li){
+             li = $.create('li', {id: id, after: world_list});
+           }
+           if (world){
+             li.innerHTML = '<strong>' + world.name + '</strong> ' + world.summary;
+           }else{
+             li.remove();
+           }
+         });
 //       user.get('said').map().once(UI);
     });
 
-      var todos = gun.get('garden-xyzzy-todo')
+      var todos = gun.get('garden-xyzzy-todo');
 
-      $('form')._.bind('submit', function (event) {
-        var input = $('form input');
-        todos.set({title: input.value});
-        input.value = '';
-        event.preventDefault();
-      })
+//       $('form')._.bind('submit', function (event) {
+//         var input = $('form input');
+//         todos.set({title: input.value});
+//         input.value = '';
+//         event.preventDefault();
+//       })
 
       todos.map().on(function (todo, id) {
         var li = $('#z' + id)
@@ -38,23 +52,3 @@
           li.remove();
         }
       })
-      function clickTitle (element) {
-        element = $(element)
-        if (!$('input', element)) {
-          element.innerHTML = '<input value="' + element.html() + '" onkeyup="keypressTitle(this)">';
-        }
-      }
-
-      function keypressTitle (element) {
-        if (event.keyCode === 13) {
-          todos.get(element.parentElement.parentElement.id.slice(1)).put({title: element.value});
-        }
-      }
-
-      function clickCheck (element) {
-        todos.get(element.parentElement.id.slice(1)).put({done: element.checked});
-      }
-
-      function clickDelete (element) {
-        todos.get(element.parentElement.id.slice(1)).put(null);
-      }
