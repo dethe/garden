@@ -22,17 +22,21 @@
   <form id="sign">
       <label for="alias">Your game name: </label><input id="alias" placeholder="Not your real name">
       <label for="pass">Passphrase: </label><input id="pass" type="password" placeholder="passphrase">
-      <input id="in" type="submit" value="sign in">
-      <input id="up" type="button" value="sign up">
+      <button id="in" type="button">Sign In</button>
+      <button id="up" type="button">Sign Up</button>
     </form>
 
-    <h1>Worlds</h1>
-    <ul id="world_list"></ul>
+    <h1 id="world_title" class="title" hidden>Worlds</h1>
+    <ul id="world_list" class="list" hidden></ul>
 
-    <form id="add_world" hidden>
+    <form id="world_add" class="add_form" hidden>
       <h1>Add World</h1>
-      <input >
-      <button>Add</button>
+      <input name="id" type="hidden" />
+      <label>Name: <input name="name" type="text" /></label><br />
+      <label>Summary: <input name="summary" type="text" /></label><br />
+      <label>Description: <textarea name="description"></textarea></label><br />
+      <label>Starting Room: <select name="starting_room"></select></label><br />
+      <button id="world_button" type="button">Add</button>
     </form>
 
   <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
