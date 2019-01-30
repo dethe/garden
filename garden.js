@@ -4,7 +4,7 @@ user.recall({sessionStorage: true})
 
 // extend Bliss.js to get values from forms
 $.add('form', function(){
-  $$('input, textarea', this).map(a => [a.name, a.value]);
+  return $$('input, textarea', this).map(a => [a.name, a.value]);
 });
 
 // Sign up handling
