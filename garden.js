@@ -41,6 +41,22 @@ gun.on('auth', function(){
   });
 });
 
+const smallRandom = () => Math.floor(Math.random() * 0xFFFFFFFF).toString(36);
+const bigRandom = () => Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36);
+const worldId = () => 'W' + smallRandom();
+const roomId = () => 'R' + bigRandom();
+const userId = () => 'U' + bigRandom();
+
+function initWorld(world){
+  world.id = worldId();
+  world.rooms = [];
+  world.characters = [];
+  world.exits = [];
+  world.startingRoom = null;
+  worlds.set(world.id, world.name);
+  // add world globally for players
+}
+
 function hideAll(){
   $$('.title, .list, .add_form')._.setAttribute('hidden',  '');
 }
