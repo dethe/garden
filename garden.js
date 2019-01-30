@@ -14,7 +14,7 @@ $('#up')._.bind('click', function(e){
 });
 
 // Sign in handling
-$('#sign')._.bind('submit', function(e){
+$('#sign')._.bind('click', function(e){
   e.preventDefault();
   user.auth($('#alias').value, $('#pass').value);
 });
