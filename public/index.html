@@ -15,11 +15,6 @@
       <h2>A collaborative text adventure development tool</h2>
     <nav>
       <ul>
-        <li>
-          <select name="character" id="choose_character">
-            <option value="">==Choose a character to promote/demote/ban==</option>
-          </select>
-        </li>
         <li id="login-button-ui">
           <button type="button" class="login-button">Log in</button>
         </li>
@@ -44,6 +39,19 @@
     </nav>
     </header>
     <main>
+      <form id="edit-character">
+        <h4>Edit Character</h4>
+        <select name="character" id="choose_character">
+            <option value="">==Choose a character to promote/demote/ban==</option>
+          </select>
+        <fieldset>
+          <legend>Who's who</legend>
+          <output id="character-name-ui" hidden></output>
+          <label id="is-wizard-ui" hidden><input type="checkbox" id="is-wizard" /></label>
+          <label id="is-banned-ui"><input type="checkbox" id="is-banned"></label>
+          <label id="is-fool-ui"><input type="checkbox" id="is-fool"></label>
+        </fieldset>
+      </form>
       <form id="edit-world">
         <h4>Edit World</h4>
         <select name="world" id="choose_world">
@@ -58,6 +66,9 @@
           <input id="world-summary" placeholder="Short description of world" />
           <label for="world-description">Description</label>
           <textarea id="world-description"></textarea>
+          <select id="world-starting-room">
+            <option value="">==Choose a starting room==</option>
+          </select>
         </fieldset>
       </form>
       <form id="edit-room">
@@ -65,7 +76,10 @@
         <fieldset>
           <legend>Rooms are where it all happens</legend>
           <label for="room-name">Name</label>
-          
+          <input id="room-name" />
+          <label for="room-summary">Summary</label>
+          <label for="room-description">Description</label>
+          <textarea id="room-description"></textarea>
         </fieldset>
       </form>
     </main>
