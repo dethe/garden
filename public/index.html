@@ -3,102 +3,53 @@
     <title>Garden of Forking Paths</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/lib/awsm.min.css">
-    <!--style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    <style>
+      *[hidden]{
+        display: none;
       }
-
-      html, body {
-        font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
-        font-weight: 400;
-        font-size: 16px;
-        color: #333;
-      }
-
-      .center-text {
-        text-align: center;
-      }
-
-      main {
-        margin-top: 100px;
-        padding: 20px;
-      }
-
-      img.logo {
-        display: block;
-        margin: 0 auto;
-        max-width: 100%;
-        margin-bottom: 30px;
-      }
-
-      h2 {
-        font-size: 2em;
-        font-weight: 100;
-      }
-
-      footer {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 20px;
-      }
-
-      footer p {
-        font-weight: 300;
-        font-size: 1.0em;
-      }
-
-      a {
-        color: #31D8A0;
-        text-decoration: none;
-      }
-
-      a:hover,
-      a:focus {
-        color: #31D8A0;
-      }
-    </style-->
+    </style>
   </head>
   <body>
     <header>
       <h1>Garden of forking paths</h1>
       <h2>A collaborative text adventure development tool</h2>
-    </header>
     <nav>
       <ul>
-        <li>
-          <select name="world" id="choose_world">
-            <option value="">==Choose a world to edit==</option>
-            <option value="new_world">Create a new world</option>
-          </select>
-        </li>
         <li>
           <select name="character" id="choose_character">
             <option value="">==Choose a character to promote/demote/ban==</option>
           </select>
         </li>
-        <li>
+        <li id="login-button-ui">
           <button type="button" class="login-button">Log in</button>
         </li>
-        <li>
+        <li id="signup-button-ui">
           <button type="button" class="signup-button">Sign up</button>
         </li>
-        <li>
-          <button type="button" class="logout-button" hidden>Log out</button>
+        <li class="logout-button-ui" hidden>
+          <button type="button" class="logout-button">Log out</button>
         </li>
-        <li>
-          <button type="button" class="edit-user" hidden>
-            <img src="USER_AVATAR" /><span id="username"></span>
+        <li class="fool-button-ui" hidden>
+          <button type="button" class="fool-button">Fool mode</button>
+        </li>
+        <li class="wizard-button-ui" hidden>
+          <button type="button" class="wizard-button">Wizard mode</button>
+        </li>
+        <li class="edit-user-ui" hidden>
+          <button type="button" class="edit-user">
+            <img id="user-avatar" src="" /><span id="user-name"></span>
           </button>
         </li>
       </ul>
     </nav>
+    </header>
     <main>
       <form id="edit-world">
         <h4>Edit World</h4>
+        <select name="world" id="choose_world">
+            <option value="">==Choose a world to edit==</option>
+            <option value="new_world">Create a new world</option>
+          </select>
         <fieldset>
           <legend>With great power comes great responsibility</legend>
           <label for="world-name">Name</label>
