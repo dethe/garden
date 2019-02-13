@@ -41,51 +41,68 @@
     <main>
       <form id="edit-character">
         <h4>Edit Character</h4>
-        <select name="character" id="choose_character">
+        <select name="character" id="choose-character">
             <option value="">==Choose a character to promote/demote/ban==</option>
           </select>
         <fieldset>
           <legend>Who's who</legend>
           <output id="character-name-ui" hidden></output>
-          <label id="is-wizard-ui" hidden><input type="checkbox" id="is-wizard" /></label>
-          <label id="is-banned-ui"><input type="checkbox" id="is-banned"></label>
-          <label id="is-fool-ui"><input type="checkbox" id="is-fool"></label>
+          <label id="is-wizard-ui" hidden><input type="checkbox" id="is-wizard" /> is a Wizard</label>
+          <label id="is-banned-ui" hidden><input type="checkbox" id="is-banned"> is Banned</label>
+          <label id="is-fool-ui" hidden><input type="checkbox" id="is-fool"> is a Fool</label>
         </fieldset>
       </form>
       <form id="edit-world">
-        <h4>Edit World</h4>
-        <select name="world" id="choose_world">
+        <details>
+          <summary><h4>Edit World</h4></summary>
+        <select name="world" id="choose-world">
             <option value="">==Choose a world to edit==</option>
-            <option value="new_world">Create a new world</option>
+            <option value="new-world">Create a new world</option>
           </select>
         <fieldset>
           <legend>With great power comes great responsibility</legend>
           <label for="world-name">Name</label>
-          <input id="world-name" />
+          <input type="text" id="world-name" />
           <label for="world-summary">Summary</label>
-          <input id="world-summary" placeholder="Short description of world" />
+          <input type="text" id="world-summary" placeholder="Short description of world" />
           <label for="world-description">Description</label>
           <textarea id="world-description"></textarea>
           <select id="world-starting-room">
             <option value="">==Choose a starting room==</option>
           </select>
         </fieldset>
+      </details>
       </form>
       <form id="edit-room">
-        <h4>Edit Room</h4>
+        <details>
+        <summary><h4>Edit Room</h4></summary>
+        <select name="room" id="choose-room">
+            <option value="">==Choose a room to edit==</option>
+            <option value="new-room">Create a new room</option>
+          </select>
         <fieldset>
           <legend>Rooms are where it all happens</legend>
           <label for="room-name">Name</label>
-          <input id="room-name" />
+          <input type="text" id="room-name" />
           <label for="room-summary">Summary</label>
           <label for="room-description">Description</label>
           <textarea id="room-description"></textarea>
+          <label for="room-design-notes"></label>
+          <textarea id="room-design-notes"></textarea>
+          <h5>Exits</h5>
+          <fieldset>
+              <ul>
+                  <label for="exit-name">Name</label>
+                  <input type="text" id="exit-name" placeholder="North"/>
+                </ul>
+                </fieldset>
         </fieldset>
+        </details>
       </form>
     </main>
-    <sidebar>
+    <aside>
       Live game will go here.
-    </sidebar>
+    </aside>
       <footer>
         <a href="https://github.com/dethe/garden">Project on Github</a>
       </footer>
