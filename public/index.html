@@ -31,7 +31,7 @@
           <button type="button" class="wizard-button">Wizard mode</button>
         </li>
         <li class="edit-user-ui" hidden>
-          <button type="button" class="edit-user">
+          <button type="button" id="edit-user-button">
             <img id="user-avatar" src="" /><span id="user-name"></span>
           </button>
         </li>
@@ -39,27 +39,34 @@
     </nav>
     </header>
     <main>
+      
       <form id="edit-character">
-        <h4>Edit Character</h4>
+        <details>
+        <summary><h4>Edit Character</h4></summary>
         <select name="character" id="choose-character">
-            <option value="">==Choose a character to promote/demote/ban==</option>
+            <option value="">Choose a character to promote/demote/ban</option>
           </select>
-        <fieldset>
+        <fieldset #edit-character-ui>
           <legend>Who's who</legend>
+          <label for="character-name-ui">Character</label>
           <output id="character-name-ui" hidden></output>
+          <label for="user-name-ui">Player</label>
+          <output id="user-name-ui" hidden></output>
           <label id="is-wizard-ui" hidden><input type="checkbox" id="is-wizard" /> is a Wizard</label>
           <label id="is-banned-ui" hidden><input type="checkbox" id="is-banned"> is Banned</label>
           <label id="is-fool-ui" hidden><input type="checkbox" id="is-fool"> is a Fool</label>
         </fieldset>
+        </details>
       </form>
+
       <form id="edit-world">
-        <details>
+        <details open>
           <summary><h4>Edit World</h4></summary>
         <select name="world" id="choose-world">
-            <option value="">==Choose a world to edit==</option>
+            <option value="">Choose a world to edit</option>
             <option value="new-world">Create a new world</option>
           </select>
-        <fieldset>
+        <fieldset id="edit-world-ui">
           <legend>With great power comes great responsibility</legend>
           <label for="world-name">Name</label>
           <input type="text" id="world-name" />
@@ -68,26 +75,31 @@
           <label for="world-description">Description</label>
           <textarea id="world-description"></textarea>
           <select id="world-starting-room">
-            <option value="">==Choose a starting room==</option>
+            <option value="">Choose a starting room</option>
           </select>
         </fieldset>
       </details>
       </form>
       <form id="edit-room">
-        <details>
+        <details open>
         <summary><h4>Edit Room</h4></summary>
         <select name="room" id="choose-room">
-            <option value="">==Choose a room to edit==</option>
+            <option value=""Choose a room to edit</option>
             <option value="new-room">Create a new room</option>
           </select>
-        <fieldset>
+        <p>Filter
+          <label><input type="radio" name="choose-room-filter" id="choose-room-filter-all" value="all" checked>All</label>
+          <label><input type="radio" name="choose-room-filter" id="choose-room-filter-orphaned" value="orphaned">Orphaned</label>
+          <label><input type="radio" name="choose-room-filter" id="choose-room-filter-deadend" value="deadend">Dead End</label>
+        </p>
+        <fieldset id="edit-room-ui">
           <legend>Rooms are where it all happens</legend>
           <label for="room-name">Name</label>
           <input type="text" id="room-name" />
           <label for="room-summary">Summary</label>
           <label for="room-description">Description</label>
           <textarea id="room-description"></textarea>
-          <label for="room-design-notes"></label>
+          <label for="room-design-notes">Design Notes (won't be shown to players)</label>
           <textarea id="room-design-notes"></textarea>
           <h5>Exits</h5>
           <fieldset>
