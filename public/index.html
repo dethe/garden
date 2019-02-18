@@ -16,19 +16,19 @@
     <nav>
       <ul>
         <li id="login-button-ui">
-          <button type="button" class="login-button">Log in</button>
+          <button type="button" id="login-button">Log in</button>
         </li>
         <li id="signup-button-ui">
-          <button type="button" class="signup-button">Sign up</button>
+          <button type="button" id="signup-button">Sign up</button>
         </li>
         <li class="logout-button-ui" hidden>
-          <button type="button" class="logout-button">Log out</button>
+          <button type="button" id="logout-button">Log out</button>
         </li>
         <li class="fool-button-ui" hidden>
-          <button type="button" class="fool-button">Fool mode</button>
+          <button type="button" id="fool-button">Fool mode</button>
         </li>
         <li class="wizard-button-ui" hidden>
-          <button type="button" class="wizard-button">Wizard mode</button>
+          <button type="button" id="wizard-button">Wizard mode</button>
         </li>
         <li class="edit-user-ui" hidden>
           <button type="button" id="edit-user-button">
@@ -39,6 +39,17 @@
     </nav>
     </header>
     <main>
+      <form id="login-form" hidden>
+        <h4>Log in</h4>
+        <fieldset #login-ui>
+          <legend>Who are you?</legend>
+          <label for="player-name">Name</label>
+          <input type="text" id="user-name" name="name" placeholder="Your name here">
+          <label for="player-passphrase">Pass phrase</label>
+          <input type="password" id="user-passphrase" name="passphrase">
+          <button type="button" id="login-action">Login</button>
+        </fieldset>
+      </form>
       
       <form id="edit-character">
         <details>
@@ -115,8 +126,13 @@
     <aside>
       Live game will go here.
     </aside>
-      <footer>
-        <a href="https://github.com/dethe/garden">Project on Github</a>
-      </footer>
+    <footer>
+      <a href="https://github.com/dethe/garden">Project on Github</a>
+    </footer>
+    <script src="/lib/bliss.min.js"></script>
+    <script src="/lib/featherjs-client-3.0.0.js"></script>
+    <script src="/lib/vue.js"></script>
+    <script src="/lib/socket.io.js"></script>
+    <script src="/js/client.js"></script>
   </body>
 </html>
