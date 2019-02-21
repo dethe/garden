@@ -21,16 +21,16 @@
         <li id="signup-button-ui">
           <button type="button" id="signup-button">Sign up</button>
         </li>
-        <li class="logout-button-ui" hidden>
+        <li id="logout-button-ui" hidden>
           <button type="button" id="logout-button">Log out</button>
         </li>
-        <li class="fool-button-ui" hidden>
+        <li id="fool-button-ui" hidden>
           <button type="button" id="fool-button">Fool mode</button>
         </li>
-        <li class="wizard-button-ui" hidden>
+        <li id="wizard-button-ui" hidden>
           <button type="button" id="wizard-button">Wizard mode</button>
         </li>
-        <li class="edit-user-ui" hidden>
+        <li id="edit-user-ui" hidden>
           <button type="button" id="edit-user-button">
             <img id="user-avatar" src="" /><span id="user-name"></span>
           </button>
@@ -40,14 +40,26 @@
     </header>
     <main>
       <form id="login-form" hidden>
-        <h4>Log in</h4>
         <fieldset #login-ui>
-          <legend>Who are you?</legend>
-          <label for="player-name">Name</label>
-          <input type="text" id="user-name" name="name" placeholder="Your name here">
-          <label for="player-passphrase">Pass phrase</label>
-          <input type="password" id="user-passphrase" name="passphrase">
+          <legend>Log in</legend>
+          <label for="login-email">Email</label>
+          <input type="text" id="login-email" name="email" placeholder="name@example.com">
+          <label for="login-password">Pass phrase</label>
+          <input type="password" id="login-password" name="password">
           <button type="button" id="login-action">Login</button>
+        </fieldset>
+      </form>
+
+      <form id="signup-form" hidden>
+        <fieldset #signup-ui>
+          <legend>Sign Up</legend>
+          <label for="signup-name">Name</label>
+          <input type="text" id="signup-name" name="name" placeholder="Friendly Waterbear">
+          <label for="signup-email">Email</label>
+          <input type="text" id="signup-email" name="email" placeholder="name@example.com">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" name="password">
+          <button type="button" id="signup-action">Sign up</button>
         </fieldset>
       </form>
       
