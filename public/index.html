@@ -63,7 +63,7 @@
         </fieldset>
       </form>
       
-      <form id="edit-character">
+      <form id="edit-character" hidden>
         <details>
         <summary><h4>Edit Character</h4></summary>
         <select name="character" id="choose-character">
@@ -78,11 +78,12 @@
           <label id="is-wizard-ui" hidden><input type="checkbox" id="is-wizard" /> is a Wizard</label>
           <label id="is-banned-ui" hidden><input type="checkbox" id="is-banned"> is Banned</label>
           <label id="is-fool-ui" hidden><input type="checkbox" id="is-fool"> is a Fool</label>
+          <button type="button" id="character-action">Save Character</button>
         </fieldset>
         </details>
       </form>
 
-      <form id="edit-world">
+      <form id="edit-world" hidden>
         <details open>
           <summary><h4>Edit World</h4></summary>
         <select name="world" id="choose-world">
@@ -97,17 +98,21 @@
           <input type="text" id="world-summary" placeholder="Short description of world" />
           <label for="world-description">Description</label>
           <textarea id="world-description"></textarea>
-          <select id="world-starting-room">
+          <select id="world-starting-room" hidden>
             <option value="">Choose a starting room</option>
           </select>
+          <button type="button" id="world-action">Save World</button>
         </fieldset>
       </details>
       </form>
-      <form id="edit-room">
+
+
+
+      <form id="edit-room" hidden>
         <details open>
         <summary><h4>Edit Room</h4></summary>
         <select name="room" id="choose-room">
-            <option value=""Choose a room to edit</option>
+            <option value="">Choose a room to edit</option>
             <option value="new-room">Create a new room</option>
           </select>
         <p>Filter
@@ -124,13 +129,14 @@
           <textarea id="room-description"></textarea>
           <label for="room-design-notes">Design Notes (won't be shown to players)</label>
           <textarea id="room-design-notes"></textarea>
-          <h5>Exits</h5>
           <fieldset>
+            <legend>Exits</legend>
               <ul>
                   <label for="exit-name">Name</label>
                   <input type="text" id="exit-name" placeholder="North"/>
                 </ul>
                 </fieldset>
+          <button type="button" id="room-action">Save Room</button>
         </fieldset>
         </details>
       </form>
