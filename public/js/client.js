@@ -73,21 +73,29 @@ function getWorld(){
   }
 }
 
-function saveWorld(evt){
-  const world = getWorld();
+async function saveWorld(evt){
+  try{
+    const world = getWorld();
+  console.log('saving the world: %o', world);
   if (world._id){
-    app.service('worlds').update(world);  
+    await app.service('worlds').update(world);  
   }else{
-    app.service('worlds').create(world);
+    await app.service('worlds').create(world);
   }
+  console.log('world has been saved! %o', world);
+}catch(e){
+  console.error('problem saving world: %o', e);
+}
 }
 
 
 $('#login-action')._.bind('click', evt => login(getLoginCredentials()));
 $('#signup-action')._.bind('click', evt => signup(getSignupCredentials()));
-$('#world-action')._.bind('click', saveWorld);
+$('#world-action')._.bind('click', () => saveWorld());
 
-function authenticated(response){
+let worlds = null;
+
+async function authenticated(response){
   $('#login-form').setAttribute('hidden', '');
   $('#signup-form').setAttribute('hidden', '');
   $('#login-button-ui').setAttribute('hidden', '');
@@ -96,7 +104,12 @@ function authenticated(response){
   $('#edit-world').removeAttribute('hidden');
 
   console.log('Authenticated: %o', response);
-  app.service('worlds').find({}).then(worlds => {console.log('Worlds: %o', worlds); state.worlds = worlds});
+  try{
+    worlds = await app.service('worlds').find({});
+    console.log('worlds: %o', worlds);
+  }catch(e){
+    console.error('Error listing worlds: %o', e);
+  }
 }
 
 function loggedOut(response){
@@ -104,7 +117,7 @@ function loggedOut(response){
   $('#login-button-ui').removeAttribute('hidden');
   $('#signup-button-ui').removeAttribute('hidden');
   $('#logout-button-ui').setAttribute('hidden', '');
-  $('#edit-world').setAttribute('hidden', '');
+  // $('#edit-world').setAttribute('hidden', '');
   $('#edit-character').setAttribute('hidden', '');
   $('#edit-room').setAttribute('hidden', '');
 }
@@ -116,7 +129,6 @@ function addWorld(world){
 app.service('worlds').on('created', addWorld);
 
 app.on('authenticated', authenticated);
-app.on('authenticated',  function(response){ app.service('worlds').find().then(worlds => console.log(worlds))});
 app.on('logout', loggedOut);
 app.on('reauthentication-error', login);
 
