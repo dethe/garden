@@ -23,16 +23,16 @@ $('#logout-button')._.bind('click', evt => app.logout());
 const getLoginCredentials = () => {
   const user = {
     email: document.querySelector('#login-email').value,
-    passphrase: document.querySelector('#login-password').value
+    password: document.querySelector('#login-password').value
   };
   return user;
 };
 
 const getSignupCredentials = () => {
   const user = {
-    name: document.querySelector('#signup-email').value,
+    name: document.querySelector('#signup-name').value,
     email: document.querySelector('#signup-email').value,
-    passphrase: document.querySelector('#signup-password').value
+    password: document.querySelector('#signup-password').value
   };
   return user;
 }
@@ -44,18 +44,20 @@ const login = async credentials => {
       // Try to authenticate using the JWT from localStorage
       await app.authenticate();
     } else {
-      // If we get login information, add the strategy we want to use for login
+      console.log('credentials: %o', credentials);      // If we get login information, add the strategy we want to use for login
       const payload = Object.assign({ strategy: 'local' }, credentials);
 
       await app.authenticate(payload);
     }
   } catch(error) {
-    console.log('authentication error: %o', error);
+    console.error('authentication error: %o', error);
+    console.log('credentials: %o', credentials);
  }
 };
 
 // sign up and log in at the same time
 const signup = async credentials => {
+  console.log('credentials: %o', credentials);      // If we get login information, add the strategy we want to use for login
   await app.service('users').create(credentials);
   await login(credentials);
 };
@@ -93,8 +95,6 @@ $('#login-action')._.bind('click', evt => login(getLoginCredentials()));
 $('#signup-action')._.bind('click', evt => signup(getSignupCredentials()));
 $('#world-action')._.bind('click', () => saveWorld());
 
-let worlds = null;
-
 async function authenticated(response){
   $('#login-form').setAttribute('hidden', '');
   $('#signup-form').setAttribute('hidden', '');
@@ -105,8 +105,11 @@ async function authenticated(response){
 
   console.log('Authenticated: %o', response);
   try{
-    worlds = await app.service('worlds').find({});
-    console.log('worlds: %o', worlds);
+    let worldsResp = await app.service('worlds').find({});
+    if (worldsResp){
+      state.worlds = worldsResp.data;
+      state.worlds.forEach(addWorld);
+    }
   }catch(e){
     console.error('Error listing worlds: %o', e);
   }
@@ -123,7 +126,8 @@ function loggedOut(response){
 }
 
 function addWorld(world){
-  console.log('add world %o', world);
+  let worldSel = $('#choose-world');
+  $.create('option', {inside: worldSel, value: world._id, contents: world.name});
 }
 
 app.service('worlds').on('created', addWorld);
