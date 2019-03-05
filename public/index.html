@@ -87,10 +87,10 @@
         <details open>
           <summary><h4>Edit World</h4></summary>
         <select name="world" id="choose-world">
-            <option value="">Choose a world to edit</option>
+            <option value="" selected="true">Choose a world to edit</option>
             <option value="new-world">Create a new world</option>
           </select>
-        <fieldset id="edit-world-ui">
+        <fieldset id="edit-world-ui" hidden>
           <legend>With great power comes great responsibility</legend>
           <label for="world-name">Name</label>
           <input type="text" id="world-name" />
@@ -98,6 +98,7 @@
           <input type="text" id="world-summary" placeholder="Short description of world" />
           <label for="world-description">Description</label>
           <textarea id="world-description"></textarea>
+          <input type="hidden" id="world-id">
           <select id="world-starting-room" hidden>
             <option value="">Choose a starting room</option>
           </select>
@@ -127,8 +128,9 @@
           <label for="room-summary">Summary</label>
           <label for="room-description">Description</label>
           <textarea id="room-description"></textarea>
-          <label for="room-design-notes">Design Notes (won't be shown to players)</label>
-          <textarea id="room-design-notes"></textarea>
+          <label for="room-notes">Design Notes (won't be shown to players)</label>
+          <textarea id="room-notes"></textarea>
+          <input type="hidden" id="room-id">
           <fieldset>
             <legend>Exits</legend>
               <ul>
