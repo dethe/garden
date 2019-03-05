@@ -1,3 +1,7 @@
+// extend bliss to have hide() method
+$.add('hide', () => this.setAttribute('hidden', ''));
+$.add('show', () => this.removeAttributte('hidden'));
+
 const socket = io();
 const app = feathers();
 app.configure(feathers.socketio(socket));
@@ -6,18 +10,13 @@ app.configure(feathers.authentication({
 }));
 
 function showLogin(evt){
-  $('#login-form').removeAttribute('hidden');
-  $('#signup-form').setAttribute('hidden', '');
+  $$('#login-form, #signup-form')._.show();
 }
 
 function showSignup(evt){
-  $('#signup-form').removeAttribute('hidden');
-  $('#login-form').setAttribute('hidden', '');
+  $('#signup-form')._.show();
+  $('#login-form')._.hide();
 }
-
-$('#login-button')._.bind('click', showLogin);
-$('#signup-button')._.bind('click', showSignup);
-$('#logout-button')._.bind('click', evt => app.logout());
 
 // Retrieve email/password object from the login/signup page
 const getLoginCredentials = () => {
@@ -44,47 +43,55 @@ const login = async credentials => {
       // Try to authenticate using the JWT from localStorage
       await app.authenticate();
     } else {
-//      console.log('credentials: %o', credentials);      // If we get login information, add the strategy we want to use for login
       const payload = Object.assign({ strategy: 'local' }, credentials);
 
       await app.authenticate(payload);
     }
   } catch(error) {
     console.error('authentication error: %o', error);
-    console.log('credentials: %o', credentials);
  }
 };
 
 // sign up and log in at the same time
 const signup = async credentials => {
-//  console.log('credentials: %o', credentials);      // If we get login information, add the strategy we want to use for login
   await app.service('users').create(credentials);
   await login(credentials);
 };
 
 
 const state = {
-
+  worlds = [],
+  currentWorld: null,
+  rooms: [],
+  currentRoom: null
 };
 
 function getWorld(){
-  return {
+  let world =  {
     name: $('#world-name').value,
     summary: $('#world-summary').value,
-    description: $('#world-description').value,
-    _id: $('#world-id').value
+    description: $('#world-description').value
   }
+  let id = $('#world-id').value;
+  if (id){
+    world._id = id;
+  }
+  return world;
 }
 
 function getRoom(){
-  return {
+  let room = {
     name: $('#room-name'.value),
     summary: $('#room-summary').value,
     description: $('#room-description').value,
     notes: $('#room-notes').value,
-    world: state.currentWorld._id,
-    _id: $('#room-id').value
+    world: state.currentWorld._id
   }
+  let id =  $('#room-id').value;
+  if (id){
+    room._id = id;
+  }
+  return room;
 }
 
 async function saveWorld(){
@@ -115,19 +122,9 @@ async function saveRoom(){
   }
 }
 
-
-$('#login-action')._.bind('click', evt => login(getLoginCredentials()));
-$('#signup-action')._.bind('click', evt => signup(getSignupCredentials()));
-$('#world-action')._.bind('click', () => saveWorld());
-$('#choose-world')._.bind('change', evt => chooseWorld(evt)); 
-
 async function authenticated(response){
-  $('#login-form').setAttribute('hidden', '');
-  $('#signup-form').setAttribute('hidden', '');
-  $('#login-button-ui').setAttribute('hidden', '');
-  $('#signup-button-ui').setAttribute('hidden', '');
-  $('#logout-button-ui').removeAttribute('hidden');
-  $('#edit-world').removeAttribute('hidden');
+  $$('#login-form, #signup-form, #login-button-ui, #signup-button-ui')._.hide();
+  $$('#logout-button-ui, #edit-world')._.show();
 
 //  console.log('Authenticated: %o', response);
 await loadWorlds();
@@ -137,10 +134,8 @@ await loadWorlds();
 async function loadWorlds(){
   try{
     // FIXME: filter to only world I have admin privs
-    let worldsResp = await app.service('worlds').find({});
-    if (worldsResp){
-      state.worlds = worldsResp.data;
-      state.worlds.forEach(addWorld);
+    let worlds = (await app.service('worlds').find({})).data;
+      data.forEach(addWorld);
     }
   }catch(e){
     console.error('Error listing worlds: %o', e);
@@ -171,6 +166,7 @@ function loggedOut(response){
 }
 
 function addWorld(world){
+  state.worlds.push(world);
   let worldSel = $('#choose-world');
   $.create('option', {inside: worldSel, value: world._id, contents: world.name});
 }
@@ -261,6 +257,8 @@ async function chooseWorld(evt){
     default:
       // id of world.
       state.currentWorld = worldForId(id);
+      console.log('world id: %s', id);
+      console.log('current world: %o', state.currentWorld);
       populateWorldForm();
       break;
   }
@@ -283,9 +281,21 @@ function chooseRoom(evt){
   }
 }
 
+// UI Listeners
+$('#login-button')._.bind('click', showLogin);
+$('#signup-button')._.bind('click', showSignup);
+$('#logout-button')._.bind('click', evt => app.logout());
+
+$('#login-action')._.bind('click', evt => login(getLoginCredentials()));
+$('#signup-action')._.bind('click', evt => signup(getSignupCredentials()));
+$('#world-action')._.bind('click', () => saveWorld());
+$('#choose-world')._.bind('change', evt => chooseWorld(evt)); 
+
+// Data listeners
 
 app.service('worlds').on('created', addWorld);
 app.service('rooms').on("created", addRoom);
+app.service('rooms').on
 
 app.on('authenticated', authenticated);
 app.on('logout', loggedOut);
