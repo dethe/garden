@@ -2,6 +2,8 @@
   "name": "garden",
   "description": "Garden of Forking Paths",
   "version": "0.1.0",
+  "repository": "https://github.com/dethe/garden",
+  "license": "pending",
   "homepage": "https://dethe.github.io/garden",
   "main": "lib",
   "keywords": [
@@ -24,6 +26,7 @@
   },
   "scripts": {
     "test": "npm run eslint && NODE_ENV= npm run mocha",
+    "dev": "./node_modules/nodemon/bin/nodemon.js src/",
     "eslint": "eslint lib/. test/. --config .eslintrc.json",
     "eslintfix": "eslint lib/. test/. --fix --config .eslintrc.json",
     "dev": "nodemon lib/",

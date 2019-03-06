@@ -1,13 +1,26 @@
 // extend bliss to have hide() method
-$.add('hide', () => this.setAttribute('hidden', ''));
-$.add('show', () => this.removeAttributte('hidden'));
+$.add('hide', function(){this.setAttribute('hidden', '')});
+$.add('show', function(){this.removeAttribute('hidden')});
 
+// Initialize FeatherJS
 const socket = io();
 const app = feathers();
 app.configure(feathers.socketio(socket));
 app.configure(feathers.authentication({
   storage: window.localStorage
 }));
+
+
+// App state, treat as immutable (only updated by Vue events, never directly)
+const state = {
+  worlds: [],
+  currentWorld: null,
+  rooms: [],
+  currentRoom: null,
+  users: [],
+  currentUser: null
+};
+
 
 function showLogin(evt){
   $$('#login-form, #signup-form')._.show();
@@ -59,13 +72,6 @@ const signup = async credentials => {
 };
 
 
-const state = {
-  worlds = [],
-  currentWorld: null,
-  rooms: [],
-  currentRoom: null
-};
-
 function getWorld(){
   let world =  {
     name: $('#world-name').value,
@@ -99,8 +105,9 @@ async function saveWorld(){
     const world = getWorld();
     console.log('saving the world: %o', world);
   if (world._id){
-    await app.service('worlds').update(world._id, world);  
+    await app.service('worlds').update(world._id, world);
   }else{
+    world.admins = [state.currentUser._id];
     await app.service('worlds').create(world);
   }
   console.log('world has been saved! %o', world);
@@ -126,17 +133,33 @@ async function authenticated(response){
   $$('#login-form, #signup-form, #login-button-ui, #signup-button-ui')._.hide();
   $$('#logout-button-ui, #edit-world')._.show();
 
-//  console.log('Authenticated: %o', response);
-await loadWorlds();
+  console.log('Authenticated: %o', response);
+  await loadUsers();
+  await loadWorlds();
+}
 
+async function loadUsers(){
+  try{
+    let users = await app.service('users').find({});
+    state.currentUser = users.currentUser;
+    users.data.forEach(addUser);
+    $('#edit-user-ui')._.show();
+    $('#user-avatar').setAttribute('src', state.currentUser.avatar);
+    $('#user-name').innerText = state.currentUser.name;
+  }catch(e){
+    console.error('Error listing users: %o', e);
+  }
 }
 
 async function loadWorlds(){
   try{
     // FIXME: filter to only world I have admin privs
-    let worlds = (await app.service('worlds').find({})).data;
-      data.forEach(addWorld);
-    }
+    let worlds = (await app.service('worlds').find({
+      admins: {
+        $in: [state.currentUser._id]
+      }
+    })).data;
+    worlds.forEach(addWorld);
   }catch(e){
     console.error('Error listing worlds: %o', e);
   }
@@ -157,12 +180,10 @@ async function loadRooms(worldId){
 
 function loggedOut(response){
   console.log('log out: %o', response);
-  $('#login-button-ui').removeAttribute('hidden');
-  $('#signup-button-ui').removeAttribute('hidden');
-  $('#logout-button-ui').setAttribute('hidden', '');
-  // $('#edit-world').setAttribute('hidden', '');
-  $('#edit-character').setAttribute('hidden', '');
-  $('#edit-room').setAttribute('hidden', '');
+  $$('#login-button-ui, #signup-button-ui')._.show();
+  $$('#logout-button-ui, #edit-world, #edit-character, #edit-room, #edit-user-ui')._.hide();
+  $('#user-avatar').setAttribute('src', '');
+  $('#user-name').innerText = '';
 }
 
 function addWorld(world){
@@ -182,6 +203,10 @@ function addRoom(room){
   if (room._id === state.selectedWorld){
     startRoom.lastChildElement.select();
   }
+}
+
+function addUser(user){
+  state.users.push(user);
 }
 
 function worldForId(id){
@@ -289,13 +314,14 @@ $('#logout-button')._.bind('click', evt => app.logout());
 $('#login-action')._.bind('click', evt => login(getLoginCredentials()));
 $('#signup-action')._.bind('click', evt => signup(getSignupCredentials()));
 $('#world-action')._.bind('click', () => saveWorld());
-$('#choose-world')._.bind('change', evt => chooseWorld(evt)); 
+$('#choose-world')._.bind('change', evt => chooseWorld(evt));
+$('#room-action')._.bind('click', () => saveWorld());
 
 // Data listeners
 
 app.service('worlds').on('created', addWorld);
 app.service('rooms').on("created", addRoom);
-app.service('rooms').on
+app.service('users').on("created", addUser);
 
 app.on('authenticated', authenticated);
 app.on('logout', loggedOut);
