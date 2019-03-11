@@ -3,25 +3,33 @@ Garden Notes - offline
 * [x] get users & current user
 * [x] Add admins to worlds, creator is first creator
 * [x] add user and timestamp for created/modified, but don't make modified when messages added
-* [ ] Filter worlds by admin priviledges
-* [ ] filter rooms by worlds
+* [x] Filter worlds by admin priviledges
+* [x] Move room and world selects to <datalist>
+* [x] Make sure we populate and clear the datalists properly
+* [ ] How to display the text of datalist vs. the options? Just clear it, world/room is already displayed in form.
+* [ ] Make sure getRoom() gets a list of exits
+* [x] Move "create new" to a button, datalist is just a list, no special cases
+* [x] filter rooms by worlds
 * [x] fix updating worlds, rooms
 * [x] give worlds an owner who can delete them
-* [ ] add room
-* [ ] edit room
+* [x] add room
+* [x] edit room
 * [ ] fix exits UI
+* [ ] Add ability to report content
+* [ ] Add terms of service/license/code of conduct
+* [ ] delete room/exit/world
 * [ ] add exit
 * [ ] view world for playing
 * [ ] view room for playing
 * [ ] add message
 * [ ] realtime updates reflected
 * [ ] immutable state
-* [ ] use vue.js for ui
+* [x] use vue.js for ui
 * [ ] room filtering by orphaned / dead-end
-* [ ] exit ui autocomplete rooms
+* [ ] exit ui select rooms
 * [ ] UI for adding admins, autocomplete users
 * [ ] Show errors in UI
-* [ ] Nicer look for current user button
-* [ ] when creating a room/world, make it the current room/world
+* [x] Nicer look for current user button
+* [x] when creating a room/world, make it the current room/world
 * [ ] test in multiple simultaneous browsers
-* [ ] when room/world updated, show something in UI
+* [x] when room/world updated, show something in UI

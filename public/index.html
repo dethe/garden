@@ -13,45 +13,43 @@
     <header>
       <h1>Garden of forking paths</h1>
       <h2>A collaborative text adventure development tool</h2>
-    <nav>
+    <nav id="nav">
       <ul>
-        <li id="login-button-ui">
-          <button type="button" id="login-button">Log in</button>
+        <li v-if="!loggedIn">
+          <button type="button" @click="showLogin">Log in</button>
         </li>
-        <li id="signup-button-ui">
-          <button type="button" id="signup-button">Sign up</button>
+        <li v-if="!loggedIn">
+          <button type="button" @click="showSignup">Sign up</button>
         </li>
-        <li id="logout-button-ui" hidden>
-          <button type="button" id="logout-button">Log out</button>
+        <li v-if="loggedIn">
+          <button type="button" @click="logout">Log out</button>
         </li>
-        <li id="fool-button-ui" hidden>
-          <button type="button" id="fool-button">Fool mode</button>
+        <li v-if="currentUser.isFool">
+          <button type="button">Fool mode</button>
         </li>
-        <li id="wizard-button-ui" hidden>
-          <button type="button" id="wizard-button">Wizard mode</button>
+        <li v-if="currentUser.isWizard">
+          <button type="button">Wizard mode</button>
         </li>
-        <li id="edit-user-ui" hidden>
-          <button type="button" id="edit-user-button">
-            <img id="user-avatar" src="" /><span id="user-name"></span>
-          </button>
+        <li v-if="currentUser">
+            <img :src="currentUser.avatar" /><span>{{ currentUser.name }}</span>
         </li>
       </ul>
     </nav>
     </header>
-    <main>
-      <form id="login-form" hidden>
-        <fieldset #login-ui>
+    <main id="main">
+      <form v-if="loginp">
+        <fieldset>
           <legend>Log in</legend>
           <label for="login-email">Email</label>
           <input type="text" id="login-email" name="email" placeholder="name@example.com">
           <label for="login-password">Pass phrase</label>
           <input type="password" id="login-password" name="password">
-          <button type="button" id="login-action">Login</button>
+          <button type="button" @click="login">Login</button>
         </fieldset>
       </form>
 
-      <form id="signup-form" hidden>
-        <fieldset #signup-ui>
+      <form v-if="signupp">
+        <fieldset>
           <legend>Sign Up</legend>
           <label for="signup-name">Name</label>
           <input type="text" id="signup-name" name="name" placeholder="Friendly Waterbear">
@@ -59,84 +57,99 @@
           <input type="text" id="signup-email" name="email" placeholder="name@example.com">
           <label for="signup-password">Password</label>
           <input type="password" id="signup-password" name="password">
-          <button type="button" id="signup-action">Sign up</button>
+          <button type="button" @click="signup">Sign up</button>
         </fieldset>
       </form>
-      
+
       <form id="edit-character" hidden>
         <details>
         <summary><h4>Edit Character</h4></summary>
         <select name="character" id="choose-character">
             <option value="">Choose a character to promote/demote/ban</option>
           </select>
-        <fieldset #edit-character-ui>
+        <fieldset>
           <legend>Who's who</legend>
           <label for="character-name-ui">Character</label>
-          <output id="character-name-ui" hidden></output>
+          <output id="character-name-ui"></output>
           <label for="user-name-ui">Player</label>
-          <output id="user-name-ui" hidden></output>
-          <label id="is-wizard-ui" hidden><input type="checkbox" id="is-wizard" /> is a Wizard</label>
-          <label id="is-banned-ui" hidden><input type="checkbox" id="is-banned"> is Banned</label>
-          <label id="is-fool-ui" hidden><input type="checkbox" id="is-fool"> is a Fool</label>
+          <output id="user-name-ui"></output>
+          <label id="is-wizard-ui"><input type="checkbox" id="is-wizard" /> is a Wizard</label>
+          <label id="is-banned-ui"><input type="checkbox" id="is-banned"> is Banned</label>
+          <label id="is-fool-ui"><input type="checkbox" id="is-fool"> is a Fool</label>
           <button type="button" id="character-action">Save Character</button>
         </fieldset>
         </details>
       </form>
 
-      <form id="edit-world" hidden>
+      <form id="edit-world" v-if="loggedIn">
         <details open>
           <summary><h4>Edit World</h4></summary>
-        <select name="world" id="choose-world">
-            <option value="" selected="true">Choose a world to edit</option>
-            <option value="new-world">Create a new world</option>
-          </select>
-        <fieldset id="edit-world-ui" hidden>
+        <select id="choose-world" v-on:change="chooseWorld">
+          <option value="">Choose a world to edit</option>
+          <option v-for="world in worlds" :value="world.id">{{world.name}}</option>
+        </select>
+        <strong>OR</strong>
+        <button type="button" v-on:click="newWorld">Create a new world</button>
+        <fieldset id="edit-world-ui" v-if="currentWorld">
           <legend>With great power comes great responsibility</legend>
           <label for="world-name">Name</label>
-          <input type="text" id="world-name" />
+          <input type="text" id="world-name" :value="currentWorld.name"/>
           <label for="world-summary">Summary</label>
-          <input type="text" id="world-summary" placeholder="Short description of world" />
+          <input type="text" id="world-summary" :value="currentWorld.summary" placeholder="Short description of world" />
           <label for="world-description">Description</label>
-          <textarea id="world-description"></textarea>
-          <input type="hidden" id="world-id">
-          <select id="world-starting-room" hidden>
-            <option value="">Choose a starting room</option>
-          </select>
+          <textarea id="world-description">{{currentWorld.description}}</textarea>
+          <input type="hidden" id="world-id" :value="currentWorld.id">
+          <label for="world-starting-room" v-if="currentWorld.rooms">Choose a starting room</label>
+          <input type="text" id="world-starting-room" v-if="currentWorld.rooms" list="room-list">
           <button type="button" id="world-action">Save World</button>
         </fieldset>
       </details>
       </form>
 
-
-
-      <form id="edit-room" hidden>
-        <details open>
-        <summary><h4>Edit Room</h4></summary>
-        <select name="room" id="choose-room">
-            <option value="">Choose a room to edit</option>
-            <option value="new-room">Create a new room</option>
-          </select>
+  <form id="edit-room" v-if="currentWorld._id">
+    <details open>
+      <summary>
+        <h4>Edit Room</h4>
+      </summary>
+        <select id="choose-room" v-on:change="chooseRoom">
+          <option value="">Choose a room to edit</option>
+          <option v-for="room in rooms" :value="room.id">{{room.name}}</option>
+        </select>
+        <strong>OR</strong>
+        <button type="button" v-on:click="newRoom">Create a new room</button>
+        <select>
+        </select>
+        <input type="text" list="room-list" id="choose-room">
+        <fieldset id="edit-room-ui" v-if="currentRoom">
+          <legend>Rooms are where it all happens</legend>
         <p>Filter
           <label><input type="radio" name="choose-room-filter" id="choose-room-filter-all" value="all" checked>All</label>
           <label><input type="radio" name="choose-room-filter" id="choose-room-filter-orphaned" value="orphaned">Orphaned</label>
           <label><input type="radio" name="choose-room-filter" id="choose-room-filter-deadend" value="deadend">Dead End</label>
         </p>
-        <fieldset id="edit-room-ui">
-          <legend>Rooms are where it all happens</legend>
           <label for="room-name">Name</label>
-          <input type="text" id="room-name" />
+          <input type="text" id="room-name" :value="currentRoom.name"/>
           <label for="room-summary">Summary</label>
-          <input type="text" id="room-summary" />
+          <input type="text" id="room-summary" :value="currentRoom.summary" />
           <label for="room-description">Description</label>
-          <textarea id="room-description"></textarea>
+          <textarea id="room-description">{{currentRoom.description}}</textarea>
           <label for="room-notes">Design Notes (won't be shown to players)</label>
-          <textarea id="room-notes"></textarea>
-          <input type="hidden" id="room-id">
+          <textarea id="room-notes">{{currentRoom.notes}}</textarea>
+          <input type="hidden" id="room-id" :value="currentRoom.id">
           <fieldset>
             <legend>Exits</legend>
-              <ul>
-                  <label for="exit-name">Name</label>
-                  <input type="text" id="exit-name" placeholder="North"/>
+              <ul id="exits-ui">
+                <li v-for="exit in currentRoom.exits">
+                  <label>Name
+                  <input type="text" placeholder="North" :value="exit.name"/>
+                  </label>
+                  <label>Destination
+                    <select>
+                      <option value="">Choose a room</option>
+                      <option v-for="room in rooms" :value="room._id" :selected="room._id === exit.room">{{room.name}}</option>
+                    </select>
+                    <input type="text" list="room-list" :value="exit.room"/>
+                  </label>
                 </ul>
                 </fieldset>
           <button type="button" id="room-action">Save Room</button>
