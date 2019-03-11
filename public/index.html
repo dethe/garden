@@ -84,75 +84,80 @@
       <form id="edit-world" v-if="loggedIn">
         <details open>
           <summary><h4>Edit World</h4></summary>
-        <select id="choose-world" v-on:change="chooseWorld">
-          <option value="">Choose a world to edit</option>
-          <option v-for="world in worlds" :value="world.id">{{world.name}}</option>
+        <select id="choose-world" @change="chooseWorld">
+          <option value="" disabled selected>Choose a world to edit</option>
+          <option v-for="world in worlds" :value="world._id">{{world.name}}</option>
         </select>
         <strong>OR</strong>
-        <button type="button" v-on:click="newWorld">Create a new world</button>
-        <fieldset id="edit-world-ui" v-if="currentWorld">
+        <button type="button" @click="newWorld">Create a new world</button>
+        <fieldset v-if="currentWorld">
           <legend>With great power comes great responsibility</legend>
-          <label for="world-name">Name</label>
-          <input type="text" id="world-name" :value="currentWorld.name"/>
-          <label for="world-summary">Summary</label>
-          <input type="text" id="world-summary" :value="currentWorld.summary" placeholder="Short description of world" />
-          <label for="world-description">Description</label>
-          <textarea id="world-description">{{currentWorld.description}}</textarea>
-          <input type="hidden" id="world-id" :value="currentWorld.id">
-          <label for="world-starting-room" v-if="currentWorld.rooms">Choose a starting room</label>
-          <input type="text" id="world-starting-room" v-if="currentWorld.rooms" list="room-list">
-          <button type="button" id="world-action">Save World</button>
+          <label>Name
+            <input type="text" v-model="currentWorld.name"/>
+          </label>
+          <label>Summary
+            <input type="text" v-model="currentWorld.summary" placeholder="Short description of world" />
+          </label>
+          <label>Description
+            <textarea v-model="currentWorld.description"></textarea>
+          </label>
+          <label v-if="rooms">Choose a starting room
+            <select model="currentRoom.startingRoom">
+              <option v-for="room in rooms" :value="room._id" :selected="room._id === currentWorld.startingRoom">{{room.name}}</option>
+            </select>
+          </label>
+          <button type="button" @click="saveWorld">Save World</button>
         </fieldset>
       </details>
       </form>
 
-  <form id="edit-room" v-if="currentWorld._id">
+  <form id="edit-room" v-if="currentWorld && currentWorld._id">
     <details open>
       <summary>
         <h4>Edit Room</h4>
       </summary>
-        <select id="choose-room" v-on:change="chooseRoom">
-          <option value="">Choose a room to edit</option>
-          <option v-for="room in rooms" :value="room.id">{{room.name}}</option>
+        <select id="choose-room" @change="chooseRoom">
+          <option value="" disabled selected>Choose a room to edit</option>
+          <option v-for="room in rooms" :value="room._id">{{room.name}}</option>
         </select>
         <strong>OR</strong>
-        <button type="button" v-on:click="newRoom">Create a new room</button>
-        <select>
-        </select>
-        <input type="text" list="room-list" id="choose-room">
-        <fieldset id="edit-room-ui" v-if="currentRoom">
+        <button type="button" @click="newRoom">Create a new room</button>
+        <fieldset v-if="currentRoom">
           <legend>Rooms are where it all happens</legend>
         <p>Filter
-          <label><input type="radio" name="choose-room-filter" id="choose-room-filter-all" value="all" checked>All</label>
-          <label><input type="radio" name="choose-room-filter" id="choose-room-filter-orphaned" value="orphaned">Orphaned</label>
-          <label><input type="radio" name="choose-room-filter" id="choose-room-filter-deadend" value="deadend">Dead End</label>
+          <label><input type="radio" name="choose-room-filter" value="all" checked>All</label>
+          <label><input type="radio" name="choose-room-filter" value="orphaned">Orphaned</label>
+          <label><input type="radio" name="choose-room-filter" value="deadend">Dead End</label>
         </p>
-          <label for="room-name">Name</label>
-          <input type="text" id="room-name" :value="currentRoom.name"/>
-          <label for="room-summary">Summary</label>
-          <input type="text" id="room-summary" :value="currentRoom.summary" />
-          <label for="room-description">Description</label>
-          <textarea id="room-description">{{currentRoom.description}}</textarea>
-          <label for="room-notes">Design Notes (won't be shown to players)</label>
-          <textarea id="room-notes">{{currentRoom.notes}}</textarea>
-          <input type="hidden" id="room-id" :value="currentRoom.id">
+          <label>Name
+            <input type="text" v-model="currentRoom.name"/>
+          </label>
+          <label>Summary
+            <input type="text" v-model="currentRoom.summary" />
+          </label>
+          <label>Description
+            <textarea v-model="currentRoom.description"></textarea>
+          </label>
+          <label>Design Notes (won't be shown to players)
+            <textarea v-model="currentRoom.notes"></textarea>
+          </label>
           <fieldset>
             <legend>Exits</legend>
-              <ul id="exits-ui">
+              <ul>
                 <li v-for="exit in currentRoom.exits">
                   <label>Name
-                  <input type="text" placeholder="North" :value="exit.name"/>
+                  <input type="text" placeholder="North" v-model="exit.name"/>
                   </label>
                   <label>Destination
-                    <select>
-                      <option value="">Choose a room</option>
+                    <select v-model="exit.room">
+                      <option value="" disabled>Choose a room</option>
                       <option v-for="room in rooms" :value="room._id" :selected="room._id === exit.room">{{room.name}}</option>
                     </select>
-                    <input type="text" list="room-list" :value="exit.room"/>
                   </label>
                 </ul>
+                <button type="button" @click="addExit">Add Exit</button>
                 </fieldset>
-          <button type="button" id="room-action">Save Room</button>
+          <button type="button" @click="saveRoom">Save Room</button>
         </fieldset>
         </details>
       </form>

@@ -15,9 +15,9 @@ function initState(){
     signupp: true,
     loggedIn: false,
     worlds: [],
-    currentWorld: {},
+    currentWorld: null,
     rooms: [],
-    currentRoom: {},
+    currentRoom: null,
     users: [],
     currentUser: {}
   };
@@ -66,42 +66,9 @@ const signup = async credentials => {
 };
 
 
-function getWorld(){
-  let world =  {
-    name: $('#world-name').value,
-    summary: $('#world-summary').value,
-    description: $('#world-description').value
-  }
-  let id = $('#world-id').value;
-  if (id){
-    world._id = id;
-  }
-  return world;
-}
-
-function getRoom(){
-  let room = {
-    name: $('#room-name').value,
-    summary: $('#room-summary').value,
-    description: $('#room-description').value,
-    notes: $('#room-notes').value,
-    world: state.currentWorld._id,
-    exits: getExits()
-  }
-  let id =  $('#room-id').value;
-  if (id){
-    room._id = id;
-  }
-  return room;
-}
-
-function getExits(){
-  return [];
-}
-
 async function saveWorld(){
   try{
-    const world = getWorld();
+    const world = state.currentWorld;
     if (world._id){
       state.currentWorld = (await app.service('worlds').patch(world._id, world)).data;
     }else{
@@ -115,13 +82,14 @@ async function saveWorld(){
 
 async function saveRoom(){
   try{
-    const room = getRoom();
+    const room = state.currentRoom;
+    console.log('Saving room for later: %o', room);
     if (room._id){
       await app.service('rooms').patch(room._id, room);
     }else{
       await app.service('rooms').create(room);
     }
-    state.currentRoom = {};
+    state.currentRoom = null;
   }catch(e){
     console.log('problem saving room: %o', e);
   }
@@ -152,8 +120,7 @@ async function loadWorlds(){
         admins: state.currentUser._id
       }
     })).data;
-    state.worlds = [];
-    worlds.forEach(addWorld);
+    state.worlds = worlds;
   }catch(e){
     console.error('Error listing worlds: %o', e);
   }
@@ -166,9 +133,7 @@ async function loadRooms(worldId){
         world: state.currentWorld._id
       }
     })).data;
-    state.rooms = [];
-    rooms.forEach(addRoom);
-    return rooms;
+    state.rooms = rooms;
   }catch(e){
     console.error('Error listing rooms: %o', e)
   }
@@ -186,16 +151,24 @@ function addRoom(room){
   if (!state.currentWorld || room.world !== state.currentWorld._id){
     return;
   }
+  state.rooms.push(room);
 }
 
 function addUser(user){
   state.users.push(user);
 }
 
+function addExit(){
+  state.currentRoom.exits.push({
+    name: "",
+    room: null
+  });
+}
+
 function worldForId(id){
   for (let i = 0; i < state.worlds.length; i++){
     if (id === state.worlds[i]._id){
-      return state.currentWorld;
+      return state.worlds[i];
     }
   }
   console.error('No world found for id: %s', id);
@@ -204,7 +177,7 @@ function worldForId(id){
 function roomForId(id){
   for(let i = 0; i < state.rooms.length; i++){
     if (id === state.rooms[i]._id){
-      return state.currentRoom;
+      return state.rooms[i];
     }
   }
   console.error('No room found for id: %s', id);
@@ -212,18 +185,15 @@ function roomForId(id){
 
 async function chooseWorld(evt){
   const id = evt.target.value;
-  console.log('chooseWorld(%s)', id);
   if (!id){
     return;
   }
   state.currentWorld = worldForId(id);
-  console.log(state.currentWorld);
   loadRooms();
 }
 
 function chooseRoom(evt){
-  const id = evt.target.value;
-  state.currentRoom = roomForId(id);
+  state.currentRoom = roomForId(evt.target.value);
 }
 
 function newWorld(){
@@ -231,23 +201,21 @@ function newWorld(){
     name: '',
     summary: '',
     description: '',
-    startingRoom: null,
-    _id: null
+    startingRoom: null
   };
   state.rooms = [];
 }
 
 function newRoom(){
-  state.curretRoom = {
+  state.currentRoom = {
     name: '',
     summary: '',
     description: '',
     notes: '',
     exits: [{
-      name: 'North',
+      name: '',
       room: null
-    }],
-    _id: null
+    }]
   };
 }
 
@@ -289,11 +257,13 @@ const uimain = new Vue({
     login: evt => login(getLoginCredentials()),
     signup: evt => signup(getSignupCredentials()),
     saveWorld: evt => saveWorld(),
+    saveRoom: evt => saveRoom(),
     chooseWorld: evt => chooseWorld(evt),
     saveRoom: evt => saveRoom(),
     chooseRoom: evt => chooseRoom(evt),
     newWorld: evt => newWorld(),
-    newRoom: evt => newRoom()
+    newRoom: evt => newRoom(),
+    addExit: evt => addExit()
   }
 });
 
