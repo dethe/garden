@@ -1,0 +1,177 @@
+<html>
+  <head>
+    <title>Garden of Forking Paths</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/lib/awsm.min.css">
+    <style>
+      *[hidden]{
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Garden of forking paths</h1>
+      <h2>A collaborative text adventure development tool</h2>
+    <nav id="nav">
+      <ul>
+        <li v-if="!loggedIn">
+          <button type="button" @click="showLogin">Log in</button>
+        </li>
+        <li v-if="!loggedIn">
+          <button type="button" @click="showSignup">Sign up</button>
+        </li>
+        <li v-if="loggedIn">
+          <button type="button" @click="logout">Log out</button>
+        </li>
+        <li v-if="currentUser.isFool">
+          <button type="button">Fool mode</button>
+        </li>
+        <li v-if="currentUser.isWizard">
+          <button type="button">Wizard mode</button>
+        </li>
+        <li v-if="currentUser">
+            <img :src="currentUser.avatar" /><span>{{ currentUser.name }}</span>
+        </li>
+      </ul>
+    </nav>
+    </header>
+    <main id="main">
+      <form v-if="loginp">
+        <fieldset>
+          <legend>Log in</legend>
+          <label for="login-email">Email</label>
+          <input type="text" id="login-email" name="email" placeholder="name@example.com">
+          <label for="login-password">Pass phrase</label>
+          <input type="password" id="login-password" name="password">
+          <button type="button" @click="login">Login</button>
+        </fieldset>
+      </form>
+
+      <form v-if="signupp">
+        <fieldset>
+          <legend>Sign Up</legend>
+          <label for="signup-name">Name</label>
+          <input type="text" id="signup-name" name="name" placeholder="Friendly Waterbear">
+          <label for="signup-email">Email</label>
+          <input type="text" id="signup-email" name="email" placeholder="name@example.com">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" name="password">
+          <button type="button" @click="signup">Sign up</button>
+        </fieldset>
+      </form>
+
+      <form id="edit-character" hidden>
+        <details>
+        <summary><h4>Edit Character</h4></summary>
+        <select name="character" id="choose-character">
+            <option value="">Choose a character to promote/demote/ban</option>
+          </select>
+        <fieldset>
+          <legend>Who's who</legend>
+          <label for="character-name-ui">Character</label>
+          <output id="character-name-ui"></output>
+          <label for="user-name-ui">Player</label>
+          <output id="user-name-ui"></output>
+          <label id="is-wizard-ui"><input type="checkbox" id="is-wizard" /> is a Wizard</label>
+          <label id="is-banned-ui"><input type="checkbox" id="is-banned"> is Banned</label>
+          <label id="is-fool-ui"><input type="checkbox" id="is-fool"> is a Fool</label>
+          <button type="button" id="character-action">Save Character</button>
+        </fieldset>
+        </details>
+      </form>
+
+      <form id="edit-world" v-if="loggedIn">
+        <details open>
+          <summary><h4>Edit World</h4></summary>
+        <select id="choose-world" @change="chooseWorld">
+          <option value="" disabled selected>Choose a world to edit</option>
+          <option v-for="world in worlds" :value="world._id">{{world.name}}</option>
+        </select>
+        <strong>OR</strong>
+        <button type="button" @click="newWorld">Create a new world</button>
+        <fieldset v-if="currentWorld">
+          <legend>With great power comes great responsibility</legend>
+          <label>Name
+            <input type="text" v-model="currentWorld.name"/>
+          </label>
+          <label>Summary
+            <input type="text" v-model="currentWorld.summary" placeholder="Short description of world" />
+          </label>
+          <label>Description
+            <textarea v-model="currentWorld.description"></textarea>
+          </label>
+          <label v-if="rooms">Choose a starting room
+            <select model="currentRoom.startingRoom">
+              <option v-for="room in rooms" :value="room._id" :selected="room._id === currentWorld.startingRoom">{{room.name}}</option>
+            </select>
+          </label>
+          <button type="button" @click="saveWorld">Save World</button>
+        </fieldset>
+      </details>
+      </form>
+
+  <form id="edit-room" v-if="currentWorld && currentWorld._id">
+    <details open>
+      <summary>
+        <h4>Edit Room</h4>
+      </summary>
+        <select id="choose-room" @change="chooseRoom">
+          <option value="" disabled selected>Choose a room to edit</option>
+          <option v-for="room in rooms" :value="room._id">{{room.name}}</option>
+        </select>
+        <strong>OR</strong>
+        <button type="button" @click="newRoom">Create a new room</button>
+        <fieldset v-if="currentRoom">
+          <legend>Rooms are where it all happens</legend>
+        <p>Filter
+          <label><input type="radio" name="choose-room-filter" value="all" checked>All</label>
+          <label><input type="radio" name="choose-room-filter" value="orphaned">Orphaned</label>
+          <label><input type="radio" name="choose-room-filter" value="deadend">Dead End</label>
+        </p>
+          <label>Name
+            <input type="text" v-model="currentRoom.name"/>
+          </label>
+          <label>Summary
+            <input type="text" v-model="currentRoom.summary" />
+          </label>
+          <label>Description
+            <textarea v-model="currentRoom.description"></textarea>
+          </label>
+          <label>Design Notes (won't be shown to players)
+            <textarea v-model="currentRoom.notes"></textarea>
+          </label>
+          <fieldset>
+            <legend>Exits</legend>
+              <ul>
+                <li v-for="exit in currentRoom.exits">
+                  <label>Name
+                  <input type="text" placeholder="North" v-model="exit.name"/>
+                  </label>
+                  <label>Destination
+                    <select v-model="exit.room">
+                      <option value="" disabled>Choose a room</option>
+                      <option v-for="room in rooms" :value="room._id" :selected="room._id === exit.room">{{room.name}}</option>
+                    </select>
+                  </label>
+                </ul>
+                <button type="button" @click="addExit">Add Exit</button>
+                </fieldset>
+          <button type="button" @click="saveRoom">Save Room</button>
+        </fieldset>
+        </details>
+      </form>
+    </main>
+    <aside>
+      Live game will go here.
+    </aside>
+    <footer>
+      <a href="https://github.com/dethe/garden">Project on Github</a>
+    </footer>
+    <script src="/lib/bliss.min.js"></script>
+    <script src="/lib/featherjs-client-3.0.0.js"></script>
+    <script src="/lib/vue.js"></script>
+    <script src="/lib/socket.io.js"></script>
+    <script src="/js/client.js"></script>
+  </body>
+</html>
