@@ -15,7 +15,10 @@ Garden Notes - offline
 * [x] add room
 * [x] edit room
 * [x] fix exits UI
-* [ ] bi-directional binding
+* [x] bi-directional binding
+* [ ] fix selects
+* [ ] test exits
+* [ ] validate content before sending
 * [ ] Add ability to report content
 * [ ] Add terms of service/license/code of conduct
 * [ ] delete room/exit/world if last admin removed
