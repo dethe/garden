@@ -26,10 +26,9 @@
   },
   "scripts": {
     "test": "npm run eslint && NODE_ENV= npm run mocha",
-    "dev": "./node_modules/nodemon/bin/nodemon.js src/",
+    "dev": "nodemon lib/",
     "eslint": "eslint lib/. test/. --config .eslintrc.json",
     "eslintfix": "eslint lib/. test/. --fix --config .eslintrc.json",
-    "dev": "nodemon lib/",
     "start": "node lib/",
     "mocha": "mocha test/ --recursive --exit"
   },
@@ -48,6 +47,7 @@
     "feathers-nedb": "^4.0.1",
     "helmet": "^3.15.0",
     "nedb": "^1.8.0",
+    "sanitize-html": "^1.20.0",
     "serve-favicon": "^2.5.0",
     "winston": "^3.2.1"
   },
