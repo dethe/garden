@@ -16,8 +16,8 @@ Garden Notes - offline
 * [x] edit room
 * [x] fix exits UI
 * [x] bi-directional binding
-* [ ] fix selects
-* [ ] test exits
+* [x] fix selects
+* [x] test exits
 * [ ] validate content before sending
 * [ ] Add ability to report content
 * [ ] Add terms of service/license/code of conduct
