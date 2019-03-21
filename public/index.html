@@ -102,8 +102,8 @@
             <textarea v-model="currentWorld.description"></textarea>
           </label>
           <label v-if="rooms">Choose a starting room
-            <select model="currentRoom.startingRoom">
-              <option v-for="room in rooms" :value="room._id" :selected="room._id === currentWorld.startingRoom">{{room.name}}</option>
+            <select v-model="currentWorld.startingRoom">
+              <option v-for="room in rooms" :value="room._id">{{room.name}}</option>
             </select>
           </label>
           <button type="button" @click="saveWorld">Save World</button>

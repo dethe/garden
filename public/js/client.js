@@ -1,28 +1,30 @@
- // Initialize FeatherJS
-const socket = io();
-const app = feathers();
-app.configure(feathers.socketio(socket));
-app.configure(feathers.authentication({
-  storage: window.localStorage
-}));
-
-
+let app;
 let state;
-// App state, treat as immutable (only updated by Vue events, never directly)
-function initState(){
+
+function initFeathers(){
+  // Initialize FeatherJS
+  const socket = io();
+  const app = feathers();
+  app.configure(feathers.socketio(socket));
+  app.configure(feathers.authentication({
+    storage: window.localStorage
+  }));
+}
+
+function initWizardState(){
   state = {
     loginp: false,
     signupp: true,
     loggedIn: false,
     worlds: [],
     currentWorld: null,
+    startingRoom: null,
     rooms: [],
     currentRoom: null,
     users: [],
     currentUser: {}
   };
 }
-initState();
 
 
 // Retrieve email/password object from the login/signup page
@@ -69,8 +71,10 @@ const signup = async credentials => {
 async function saveWorld(){
   try{
     const world = state.currentWorld;
+    let retval;
+    console.log('Saving world for later: %s', JSON.stringify(world));
     if (world._id){
-      state.currentWorld = (await app.service('worlds').patch(world._id, world)).data;
+      state.currentWorld = await app.service('worlds').patch(world._id, world);
     }else{
       world.admins = [state.currentUser._id];
       state.currentWorld = (await app.service('worlds').create(world)).data;
@@ -83,11 +87,11 @@ async function saveWorld(){
 async function saveRoom(){
   try{
     const room = state.currentRoom;
-    console.log('Saving room for later: %o', room);
+    console.log('Saving room for later: %s', JSON.stringify(room));
     if (room._id){
-      await app.service('rooms').patch(room._id, room);
+      state.currentRoom = await app.service('rooms').patch(room._id, room);
     }else{
-      await app.service('rooms').create(room);
+      state.currentRoom = await app.service('rooms').create(room);
     }
     state.currentRoom = null;
   }catch(e){
@@ -232,40 +236,52 @@ function showLogin(){
 
 // Data listeners
 
-app.service('worlds').on('created', addWorld);
-app.service('rooms').on("created", addRoom);
-app.service('users').on("created", addUser);
+function initWizardListeners(){
+  app.service('worlds').on('created', addWorld);
+  app.service('rooms').on("created", addRoom);
+  app.service('users').on("created", addUser);
 
-app.on('authenticated', authenticated);
-app.on('logout', loggedOut);
-app.on('reauthentication-error', login);
+  app.on('authenticated', authenticated);
+  app.on('logout', loggedOut);
+  app.on('reauthentication-error', login);
+}
 
-const uinav = new Vue({
-  el: "#nav",
-  data: state,
-  methods: {
-    showLogin: evt => showLogin(),
-    showSignup: evt => showSignup(),
-    logout: evt => app.logout()
-  }
-});
+function initLoginUI(){
+  const uinav = new Vue({
+    el: "#nav",
+    data: state,
+    methods: {
+      showLogin: evt => showLogin(),
+      showSignup: evt => showSignup(),
+      logout: evt => app.logout()
+    }
+  });
+}
 
-const uimain = new Vue({
-  el: "#main",
-  data: state,
-  methods: {
-    login: evt => login(getLoginCredentials()),
-    signup: evt => signup(getSignupCredentials()),
-    saveWorld: evt => saveWorld(),
-    saveRoom: evt => saveRoom(),
-    chooseWorld: evt => chooseWorld(evt),
-    saveRoom: evt => saveRoom(),
-    chooseRoom: evt => chooseRoom(evt),
-    newWorld: evt => newWorld(),
-    newRoom: evt => newRoom(),
-    addExit: evt => addExit()
-  }
-});
+function initWizardUI(){
+  const uimain = new Vue({
+    el: "#main",
+    data: state,
+    methods: {
+      login: evt => login(getLoginCredentials()),
+      signup: evt => signup(getSignupCredentials()),
+      saveWorld: evt => saveWorld(),
+      saveRoom: evt => saveRoom(),
+      chooseWorld: evt => chooseWorld(evt),
+      saveRoom: evt => saveRoom(),
+      chooseRoom: evt => chooseRoom(evt),
+      newWorld: evt => newWorld(),
+      newRoom: evt => newRoom(),
+      addExit: evt => addExit()
+    }
+  });
+}
 
-login();
-
+function initWizard(){
+  initFeathers();
+  initWizardState();
+  initWizardListeners();
+  initLoginUI();
+  initWizardUI();
+  login();
+}
