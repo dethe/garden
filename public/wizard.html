@@ -3,11 +3,6 @@
     <title>Garden of Forking Paths</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/lib/awsm.min.css">
-    <style>
-      *[hidden]{
-        display: none;
-      }
-    </style>
   </head>
   <body>
     <header>
@@ -61,7 +56,7 @@
         </fieldset>
       </form>
 
-      <form id="edit-character" hidden>
+      <form v-if="false" id="edit-character">
         <details>
         <summary><h4>Edit Character</h4></summary>
         <select name="character" id="choose-character">
@@ -90,19 +85,19 @@
         </select>
         <strong>OR</strong>
         <button type="button" @click="newWorld">Create a new world</button>
-        <fieldset v-if="currentWorld">
+        <fieldset v-if="world">
           <legend>With great power comes great responsibility</legend>
           <label>Name
-            <input type="text" v-model="currentWorld.name"/>
+            <input type="text" v-model="world.name"/>
           </label>
           <label>Summary
-            <input type="text" v-model="currentWorld.summary" placeholder="Short description of world" />
+            <input type="text" v-model="world.summary" placeholder="Short description of world" />
           </label>
           <label>Description
-            <textarea v-model="currentWorld.description"></textarea>
+            <textarea v-model="world.description"></textarea>
           </label>
           <label v-if="rooms">Choose a starting room
-            <select v-model="currentWorld.startingRoom">
+            <select v-model="world.startingRoom">
               <option v-for="room in rooms" :value="room._id">{{room.name}}</option>
             </select>
           </label>
@@ -111,7 +106,7 @@
       </details>
       </form>
 
-  <form id="edit-room" v-if="currentWorld && currentWorld._id">
+  <form id="edit-room" v-if="world && world._id">
     <details open>
       <summary>
         <h4>Edit Room</h4>
@@ -122,7 +117,7 @@
         </select>
         <strong>OR</strong>
         <button type="button" @click="newRoom">Create a new room</button>
-        <fieldset v-if="currentRoom">
+        <fieldset v-if="room">
           <legend>Rooms are where it all happens</legend>
         <p>Filter
           <label><input type="radio" name="choose-room-filter" value="all" checked>All</label>
@@ -130,21 +125,21 @@
           <label><input type="radio" name="choose-room-filter" value="deadend">Dead End</label>
         </p>
           <label>Name
-            <input type="text" v-model="currentRoom.name"/>
+            <input type="text" v-model="room.name"/>
           </label>
           <label>Summary
-            <input type="text" v-model="currentRoom.summary" />
+            <input type="text" v-model="room.summary" />
           </label>
           <label>Description
-            <textarea v-model="currentRoom.description"></textarea>
+            <textarea v-model="room.description"></textarea>
           </label>
           <label>Design Notes (won't be shown to players)
-            <textarea v-model="currentRoom.notes"></textarea>
+            <textarea v-model="room.notes"></textarea>
           </label>
           <fieldset>
             <legend>Exits</legend>
               <ul>
-                <li v-for="exit in currentRoom.exits">
+                <li v-for="exit in room.exits">
                   <label>Name
                   <input type="text" placeholder="North" v-model="exit.name"/>
                   </label>
@@ -163,12 +158,11 @@
       </form>
     </main>
     <aside>
-      Live game will go here.
+      <iframe :src="path(room)"></iframe>
     </aside>
     <footer>
       <a href="https://github.com/dethe/garden">Project on Github</a>
     </footer>
-    <script src="/lib/bliss.min.js"></script>
     <script src="/lib/featherjs-client-3.0.0.js"></script>
     <script src="/lib/vue.js"></script>
     <script src="/lib/socket.io.js"></script>

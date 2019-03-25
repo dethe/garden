@@ -8,7 +8,7 @@
 <body>
     <header>
         <h1>Garden of forking paths</h1>
-        <h2>{{world.name}}</h2>
+        <h2 v-if="world">{{world.name}}</h2>
         <nav id="nav">
             <ul>
                 <li v-if="!loggedIn">
@@ -56,17 +56,27 @@
                 <button type="button" @click="signup">Sign up</button>
             </fieldset>
         </form>
-        <article>
+        <article v-if="world">
             <p :title="world.description">{{world.summary}}<p>
             <hr>
-            <h3>{{room.name}}</h3>
-            <p>{{room.summary}}</p>
-            <details>{{room.description}}</details>
-            <ul>
-                <li v-for="exit in room.exits">
-                    <a href="/{{world._id}}/{{exit.room}}">{{exit.name}}
-                </li>
-            </ul>
+            <template v-if="room">
+                <h3>{{room.name}}</h3>
+                <p>{{room.summary}}</p>
+                <details>{{room.description}}</details>
+                <ul>
+                    <li v-for="exit in room.exits">
+                        <a href="path(room)">{{exit.name}}
+                    </li>
+                </ul>
+            </template>
+        </article>
+        <article v-else>
+          <label>Choose a world
+            <select @change="choosePlayerWorld">
+              <option value="" disabled>Select a world</option>
+              <option v-for="world in worlds" :value="world._id" :title="world.summary">{{world.name}}</option>
+            </select>
+          </label>
         </article>
 
 
