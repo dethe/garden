@@ -8,7 +8,6 @@
 <body>
     <header>
         <h1>Garden of forking paths</h1>
-        <h2 v-if="world">{{world.name}}</h2>
         <nav id="nav">
             <ul>
                 <li v-if="!loggedIn">
@@ -33,6 +32,7 @@
         </nav>
     </header>
     <main id="main">
+        <h2 v-if="world">{{ world.name }}</h2>
         <form v-if="loginp">
             <fieldset>
                 <legend>Log in</legend>
@@ -56,24 +56,48 @@
                 <button type="button" @click="signup">Sign up</button>
             </fieldset>
         </form>
+
+    <details open>
+        <summary>{{player.name}}</summary>
+        <form v-if="world">
+            <fieldset>
+                <legend>Edit Character</legend>
+                <label>Character
+                    <input v-model="player.name" placeholder="Name"/>
+                </label>
+                <label>Summary
+                    <input v-model="player.summary" placeholder="What is this character about?"/>
+                </label>
+                <label>description
+                    <textarea v-model="player.description" placeholder="What does this character look like?"></textarea>
+                </label>
+                <button type="button" @click="savePlayer">Save Character</button>
+            </fieldset>
+        </form>
+    </details>
+
+
         <article v-if="world">
             <p :title="world.description">{{world.summary}}<p>
             <hr>
             <template v-if="room">
                 <h3>{{room.name}}</h3>
-                <p>{{room.summary}}</p>
-                <details>{{room.description}}</details>
+                <details>
+                    <summary><p>{{room.summary}}<p></summary>
+                    {{room.description}}</details>
                 <ul>
+                    <h3>Exits</h3>
                     <li v-for="exit in room.exits">
-                        <a href="path(room)">{{exit.name}}
+                        <a :href="path(room)">{{exit.name}}
                     </li>
                 </ul>
             </template>
         </article>
+
         <article v-else>
           <label>Choose a world
-            <select @change="choosePlayerWorld">
-              <option value="" disabled>Select a world</option>
+            <select @change="loadWorld">
+              <option value="" disabled selected>Select a world</option>
               <option v-for="world in worlds" :value="world._id" :title="world.summary">{{world.name}}</option>
             </select>
           </label>

@@ -40,7 +40,9 @@ function initPlayerState(){
     signupp: false,
     loggedIn: false,
     world: null,
+    worlds: [],
     room: null,
+    rooms: [],
     characters: [],
     player: {}, // the character of the current user
     currentUser: {}
@@ -93,7 +95,6 @@ async function saveWorld(world){
     if (!world){
       world = state.world;
     }
-    let retval;
     console.log('Saving world for later: %s', JSON.stringify(world));
     if (world._id){
       state.world = await app.service('worlds').patch(world._id, world);
@@ -106,9 +107,25 @@ async function saveWorld(world){
   }
 }
 
+async function savePlayer(){
+  const player = state.player;
+  let savePlayer;
+  if (player._id){
+    savedPlayer = await app.service('characters').patch(player._id, player);
+    console.log('patched player: %o', savedPlayer);
+  }else{
+    player.world = state.world._id;
+    player.room = state.world.startingRoom;
+    player.user = state.currentUser._id;
+    savedPlayer = (await app.service('characters').create(player));
+    console.log('created player: %o', savedPlayer);
+  }
+}
+
 async function saveRoom(){
   try{
     const room = state.room;
+    room.world = state.world._id;
     console.log('Saving room for later: %s', JSON.stringify(room));
     if (room._id){
       state.room = await app.service('rooms').patch(room._id, room);
@@ -126,7 +143,7 @@ async function onWizardLogin(response){
   state.loginp = false;
   state.signupp = false;
   await loadUsers();
-  state.worlds = loadWorlds();
+  state.worlds = await loadWorlds();
 }
 
 async function onPlayerLogin(response){
@@ -138,26 +155,53 @@ async function onPlayerLogin(response){
 
 async function loadGame(){
   const url = new URL(location.toString());
-  // get world id from url query
   const worldId = url.searchParams.get('w');
-  // get room id from a) url, b) character, c) world starting room
-  let roomId = url.searchParams.get('r');
+  state.currentUser =  await loadCurrentUser();
   // if world, load world and room
   if (worldId){
-    state.world = await loadWorld(worldId);
-    state.player = await loadPlayer(worldId, currentUser._id);
-    if (state.player && state.player.room){
-      roomId = state.player.room;
-    }
-    if (!roomId){
-      roomId = state.world
-      state.room = app.service('rooms').get(state.player.room);
-    }
-  // load characters
+    loadWorld(worldId);
+  // FIXME: load characters
   }else{
   // else load public worlds
     state.worlds = await loadPublicWorlds();
   }
+}
+async function loadWorld(id) {
+  if (!id) {
+    return null;
+  }
+  // console.log('loadWorld(%s)', id);
+  state.player = await loadPlayer(id, state.currentUser._id);
+  // console.log('state.player: %o', state.player);
+  state.world = await app.service('worlds').get(id);
+  // console.log('state.world: %o', state.world);
+  loadRoom();
+}
+
+
+async function loadRoom(){
+  console.log('loadRoom()');
+  const url = new URL(location.toString());
+  let roomId;
+  if (state.player && state.player.room) {
+    roomId = state.player.room;
+    console.log('player room: %s', roomId);
+  }
+  let roomParam = url.searchParams.get('r');
+  if (roomParam){
+    roomId = roomParam;
+    console.log('parameter room: %s', roomId);
+  }
+  if (!roomId) {
+    roomId = state.world.startingRoom;
+    if (!roomId){
+      console.log('No room set for world %o', state.world);
+      return null;
+    }
+  }
+  console.log('loadRoom(%s)', roomId);
+  state.room = await app.service('rooms').get(roomId);
+  console.log('state.room: %o', state.room);
 }
 
 async function loadPlayer(worldId, userId){
@@ -165,11 +209,17 @@ async function loadPlayer(worldId, userId){
     return (await app.service('characters').find({
       world: worldId,
       user: userId
-    })).data[0];
+    })).data[0] || {};
   }catch(e){
     console.error("Error loading player: %o", e);
     return null;
   }
+}
+
+async function loadCurrentUser(){
+  return (await app.service('users').find({
+    query: {_id: 0}
+  })).currentUser;
 }
 
 async function loadUsers(){
@@ -184,7 +234,7 @@ async function loadUsers(){
 
 async function loadWorlds(){
   try{
-    return worlds = (await app.service('worlds').find({
+    return (await app.service('worlds').find({
       query: {
         admins: state.currentUser._id
       }
@@ -199,13 +249,19 @@ async function loadPublicWorlds(){
   try{
     return (await app.service('worlds').find({
       query: {
-        private: false
+//        private: false
       }
     })).data;
   }catch(e){
     console.error('Error listing worlds: %o', e);
     return [];
   }
+}
+
+async function loadAllRooms(){
+  let rooms = (await app.service('rooms').find({
+  })).data;
+  console.log(rooms);
 }
 
 async function loadRooms(worldId){
@@ -272,13 +328,6 @@ async function chooseWorld(evt){
   }
   state.world = worldForId(id);
   loadRooms();
-}
-
-async function loadWorld(id){
-  if (!id){
-    return null;
-  }
-  return await app.service('worlds').get(id);
 }
 
 function chooseRoom(evt){
@@ -386,7 +435,6 @@ function initWizardUI(){
       saveWorld: evt => saveWorld(),
       saveRoom: evt => saveRoom(),
       chooseWorld: evt => chooseWorld(evt),
-      saveRoom: evt => saveRoom(),
       chooseRoom: evt => chooseRoom(evt),
       newWorld: evt => newWorld(),
       newRoom: evt => newRoom(),
@@ -406,6 +454,7 @@ function initPlayerUI(){
       exitRoom: evt => exitRoom(evt.target.href),
       sendMessage: evt => sendMessage(evt.target.value),
       loadWorld: evt => state.world = loadWorld(evt.target.value),
+      savePlayer: evt => savePlayer(evt),
       path: room => `/?w=${world._id}&r=${room._id}`
     }
   });

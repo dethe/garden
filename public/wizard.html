@@ -96,6 +96,9 @@
           <label>Description
             <textarea v-model="world.description"></textarea>
           </label>
+          <label>Invite-only
+            <input type="checkbox" v-model="world.private" />
+          </label>
           <label v-if="rooms">Choose a starting room
             <select v-model="world.startingRoom">
               <option v-for="room in rooms" :value="room._id">{{room.name}}</option>
