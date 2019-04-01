@@ -45,7 +45,8 @@ function initPlayerState(){
     rooms: [],
     characters: [],
     player: {}, // the character of the current user
-    currentUser: {}
+    currentUser: {},
+    messages: []
   }
 }
 
@@ -178,6 +179,18 @@ async function loadWorld(id) {
   loadRoom();
 }
 
+async function loadRoomById(id){
+  return await app.service('rooms').get(id);
+}
+
+async function loadRoomByEvt(evt){
+  evt.preventDefault();
+  state.room = await loadRoomById(evt.target.dataset.room);
+  player.room = state.room.id;
+  savePlayer();
+  return state.room;
+}
+
 
 async function loadRoom(){
   console.log('loadRoom()');
@@ -199,9 +212,7 @@ async function loadRoom(){
       return null;
     }
   }
-  console.log('loadRoom(%s)', roomId);
-  state.room = await app.service('rooms').get(roomId);
-  console.log('state.room: %o', state.room);
+  state.room = await loadRoomById(roomId);
 }
 
 async function loadPlayer(worldId, userId){
@@ -290,6 +301,18 @@ function addRoom(room){
     return;
   }
   state.rooms.push(room);
+}
+
+function addCharacter(character){
+  if (state.world && character.world === state.world._id){
+    state.characters.push(character);
+  }
+}
+
+function addMessage(message){
+  if (state.room && message.room === state.room._id){
+    state.messages.push();
+  }
 }
 
 function addUser(user){
@@ -390,6 +413,19 @@ function sendMessage(message) {
   console.log('sendMessage(%s)', message);
 }
 
+function formatDate(timestamp){
+  return new Date(timestamp).toLocaleString();
+}
+
+function characterName(id){
+  for (let i = 0; i < state.characters.length; i++){
+    if (state.characters[i]._id === id){
+      return state.characters[i].name;
+    }
+  }
+  return "No name found for " + id;
+}
+
 
 // Data listeners
 
@@ -407,6 +443,10 @@ function initPlayerListeners(){
   app.service('worlds').on('updated', updatePlayerWorld);
   app.service('rooms').on('updated', updatePlayerRoom);
   app.service('characters').on('updated', updatePlayerCharacter);
+  app.service('messages').on('created', addMessage);
+  app.service('worlds').on('created', addWorld)
+  app.service('rooms').on('created', addRoom);
+  app.service('characters').on('created', addCharacter);
 
   app.on('authenticated', onPlayerLogin);
   app.on('logout', loggedOut);
@@ -439,7 +479,7 @@ function initWizardUI(){
       newWorld: evt => newWorld(),
       newRoom: evt => newRoom(),
       addExit: evt => addExit(),
-      path: room => `/?w=${world._id}&r=${room._id}`
+      path: (world, room) => `/?w=${world._id}&r=${room._id}`
     }
   });
 }
@@ -454,8 +494,12 @@ function initPlayerUI(){
       exitRoom: evt => exitRoom(evt.target.href),
       sendMessage: evt => sendMessage(evt.target.value),
       loadWorld: evt => state.world = loadWorld(evt.target.value),
+      loadRoom: evt => loadRoom(evt),
+      loadRoomByEvt: evt => loadRoomByEvt(evt),
       savePlayer: evt => savePlayer(evt),
-      path: room => `/?w=${world._id}&r=${room._id}`
+      characterName: id => characterName(id),
+      formatDate: timestamp => formatDate(timestamp),
+      path: room => `/?&r=${room._id}`
     }
   });
 }

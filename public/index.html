@@ -4,6 +4,7 @@
     <title>Garden of Forking Paths</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/lib/awsm.min.css">
+    <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
     <header>
@@ -32,13 +33,28 @@
         </nav>
     </header>
     <main id="main">
-        <h2 v-if="world">{{ world.name }}</h2>
+
+<aside id="chat" style="background-color: cornsilk">
+    <template v-if="room">
+        <h3>Chat</h3>
+        <div class="scrolldiv">
+            <template v-for="message in messages">
+                <blockquote v-for="message in messages">
+                    {{message.text}}
+                </blockquote>
+                <cite>{{characterName(message.createdBy)}} <small>{{formatDate(message.createdOn)}}</small></cite>
+            </template>
+        </div>
+        <input type="text" @submit="sendMessage" />
+    </template>
+</aside>
+
         <form v-if="loginp">
             <fieldset>
                 <legend>Log in</legend>
                 <label for="login-email">Email</label>
                 <input type="text" id="login-email" name="email" placeholder="name@example.com">
-                <label for="login-password">Pass phrase</label>
+                <label for="login-password">Passphrase</label>
                 <input type="password" id="login-password" name="password">
                 <button type="button" @click="login">Login</button>
             </fieldset>
@@ -57,7 +73,7 @@
             </fieldset>
         </form>
 
-    <details open>
+    <details closed>
         <summary>{{player.name}}</summary>
         <form v-if="world">
             <fieldset>
@@ -78,7 +94,11 @@
 
 
         <article v-if="world">
-            <p :title="world.description">{{world.summary}}<p>
+            <h2>{{world.name}}</h2>
+            <details closed>
+                <summary>{{world.summary}}</summary>
+                {{world.description}}
+            </details>
             <hr>
             <template v-if="room">
                 <h3>{{room.name}}</h3>
@@ -88,26 +108,22 @@
                 <ul>
                     <h3>Exits</h3>
                     <li v-for="exit in room.exits">
-                        <a :href="path(room)">{{exit.name}}
+                        <a :href="path(room)" :data-room="room._id" @clicked="loadRoomByEvt">{{exit.name}}
                     </li>
                 </ul>
             </template>
         </article>
 
         <article v-else>
-          <label>Choose a world
+          <label v-if="loggedIn">Choose a world
             <select @change="loadWorld">
               <option value="" disabled selected>Select a world</option>
               <option v-for="world in worlds" :value="world._id" :title="world.summary">{{world.name}}</option>
             </select>
           </label>
         </article>
-
-
     </main>
-    <aside>
-       Chat goes here
-    </aside>
+
     <script src="/lib/featherjs-client-3.0.0.js"></script>
     <script src="/lib/vue.js"></script>
     <script src="/lib/socket.io.js"></script>

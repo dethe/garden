@@ -3,6 +3,7 @@
     <title>Garden of Forking Paths</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/lib/awsm.min.css">
+    <link rel="stylesheet" href="/css/app.css">
   </head>
   <body>
     <header>
@@ -32,12 +33,16 @@
     </nav>
     </header>
     <main id="main">
+          <aside id="preview">
+            <iframe v-if="world && room" :src="path(world, room)"></iframe>
+          </aside>
+
       <form v-if="loginp">
         <fieldset>
           <legend>Log in</legend>
           <label for="login-email">Email</label>
           <input type="text" id="login-email" name="email" placeholder="name@example.com">
-          <label for="login-password">Pass phrase</label>
+          <label for="login-password">Passphrase</label>
           <input type="password" id="login-password" name="password">
           <button type="button" @click="login">Login</button>
         </fieldset>
@@ -160,9 +165,6 @@
         </details>
       </form>
     </main>
-    <aside>
-      <iframe :src="path(room)"></iframe>
-    </aside>
     <footer>
       <a href="https://github.com/dethe/garden">Project on Github</a>
     </footer>
