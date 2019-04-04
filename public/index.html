@@ -45,7 +45,9 @@
                 <cite>{{characterName(message.createdBy)}} <small>{{formatDate(message.createdOn)}}</small></cite>
             </template>
         </div>
-        <input type="text" @submit="sendMessage" />
+        <form @submit="sendMessage">
+            <input type="text"/>
+        </form>
     </template>
 </aside>
 

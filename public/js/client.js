@@ -176,7 +176,11 @@ async function loadWorld(id) {
   // console.log('state.player: %o', state.player);
   state.world = await app.service('worlds').get(id);
   // console.log('state.world: %o', state.world);
+  state.characters = await loadCharacters(id);
   loadRoom();
+}
+
+async function loadCharacters(worldid){
 }
 
 async function loadRoomById(id){
@@ -226,6 +230,18 @@ async function loadPlayer(worldId, userId){
     return null;
   }
 }
+
+async function loadCharacters(worldId) {
+  try{
+    return (await app.service('characters').find({
+      world: worldId
+    })).data
+  }catch(e){
+    console.error('Error loading characters: %o, e);
+    return null;
+  }
+}
+
 
 async function loadCurrentUser(){
   return (await app.service('users').find({
@@ -408,9 +424,15 @@ function exitRoom(room) {
   console.log('exitRoom(%s)', room);
 }
 
-function sendMessage(message) {
+function sendMessage(evt) {
   // FIXME
-  console.log('sendMessage(%s)', message);
+  evt.preventDefault();
+  let message = evt.target.firstElementChild.value;
+  await app.service('messsages').create({
+    text: message,
+    name: state.player.name,
+    player: state.player._id
+  });
 }
 
 function formatDate(timestamp){
@@ -492,7 +514,7 @@ function initPlayerUI(){
       login: evt => login(getLoginCredentials()),
       signup: evt => signup(getSignupCredentials()),
       exitRoom: evt => exitRoom(evt.target.href),
-      sendMessage: evt => sendMessage(evt.target.value),
+      sendMessage: evt => sendMessage(evt),
       loadWorld: evt => state.world = loadWorld(evt.target.value),
       loadRoom: evt => loadRoom(evt),
       loadRoomByEvt: evt => loadRoomByEvt(evt),
