@@ -1,7 +1,7 @@
 let app;
 let state;
 
-function initFeathers(){
+function initFeathers() {
   // Initialize FeatherJS
   const socket = io();
   app = feathers();
@@ -11,7 +11,7 @@ function initFeathers(){
   }));
 }
 
-function initWizardState(){
+function initWizardState() {
   state = {
     loginp: false,
     signupp: true,
@@ -26,7 +26,7 @@ function initWizardState(){
   };
 }
 
-function initFoolState(){
+function initFoolState() {
   state = {
     loginp: false,
     signupp: false,
@@ -34,7 +34,7 @@ function initFoolState(){
   };
 }
 
-function initPlayerState(){
+function initPlayerState() {
   state = {
     loginp: false,
     signupp: false,
@@ -72,16 +72,16 @@ const getSignupCredentials = () => {
 // Log in either using the given email/password or the token from storage
 const login = async credentials => {
   try {
-    if(!credentials) {
+    if (!credentials) {
       // Try to authenticate using the JWT from localStorage
       await app.authenticate();
     } else {
       const payload = Object.assign({ strategy: 'local' }, credentials);
       await app.authenticate(payload);
     }
-  } catch(error) {
+  } catch (error) {
     console.error('authentication error: %o', error);
- }
+  }
 };
 
 // sign up and log in at the same time
@@ -91,30 +91,30 @@ const signup = async credentials => {
 };
 
 
-async function saveWorld(world){
-  try{
-    if (!world){
+async function saveWorld(world) {
+  try {
+    if (!world) {
       world = state.world;
     }
     console.log('Saving world for later: %s', JSON.stringify(world));
-    if (world._id){
+    if (world._id) {
       state.world = await app.service('worlds').patch(world._id, world);
-    }else{
+    } else {
       world.admins = [state.currentUser._id];
       state.world = (await app.service('worlds').create(world)).data;
     }
-  }catch(e){
+  } catch (e) {
     console.error('problem saving world: %o', e);
   }
 }
 
-async function savePlayer(){
+async function savePlayer() {
   const player = state.player;
   let savePlayer;
-  if (player._id){
+  if (player._id) {
     savedPlayer = await app.service('characters').patch(player._id, player);
     console.log('patched player: %o', savedPlayer);
-  }else{
+  } else {
     player.world = state.world._id;
     player.room = state.world.startingRoom;
     player.user = state.currentUser._id;
@@ -123,23 +123,23 @@ async function savePlayer(){
   }
 }
 
-async function saveRoom(){
-  try{
+async function saveRoom() {
+  try {
     const room = state.room;
     room.world = state.world._id;
     console.log('Saving room for later: %s', JSON.stringify(room));
-    if (room._id){
+    if (room._id) {
       state.room = await app.service('rooms').patch(room._id, room);
-    }else{
+    } else {
       state.room = await app.service('rooms').create(room);
     }
     state.room = null;
-  }catch(e){
+  } catch (e) {
     console.log('problem saving room: %o', e);
   }
 }
 
-async function onWizardLogin(response){
+async function onWizardLogin(response) {
   state.loggedIn = true;
   state.loginp = false;
   state.signupp = false;
@@ -147,47 +147,44 @@ async function onWizardLogin(response){
   state.worlds = await loadWorlds();
 }
 
-async function onPlayerLogin(response){
+async function onPlayerLogin(response) {
   state.loggedIn = true;
   state.loginp = false;
   state.signupp = false;
   await loadGame();
 }
 
-async function loadGame(){
+async function loadGame() {
   const url = new URL(location.toString());
   const worldId = url.searchParams.get('w');
-  state.currentUser =  await loadCurrentUser();
+  state.currentUser = await loadCurrentUser();
   // if world, load world and room
-  if (worldId){
-    loadWorld(worldId);
-  // FIXME: load characters
-  }else{
-  // else load public worlds
+  if (worldId) {
+    await loadWorld(worldId);
+  } else {
+    // else load public worlds
     state.worlds = await loadPublicWorlds();
   }
 }
-async function loadWorld(id) {
-  if (!id) {
+
+async function loadWorld(worldId) {
+  if (!worldId) {
     return null;
   }
   // console.log('loadWorld(%s)', id);
-  state.player = await loadPlayer(id, state.currentUser._id);
+  state.player = await loadPlayer(worldId, state.currentUser._id);
   // console.log('state.player: %o', state.player);
-  state.world = await app.service('worlds').get(id);
+  state.world = await app.service('worlds').get(worldId);
   // console.log('state.world: %o', state.world);
-  state.characters = await loadCharacters(id);
+  state.characters = await loadCharacters(worldId);
   loadRoom();
 }
 
-async function loadCharacters(worldid){
-}
-
-async function loadRoomById(id){
+async function loadRoomById(id) {
   return await app.service('rooms').get(id);
 }
 
-async function loadRoomByEvt(evt){
+async function loadRoomByEvt(evt) {
   evt.preventDefault();
   state.room = await loadRoomById(evt.target.dataset.room);
   player.room = state.room.id;
@@ -195,8 +192,7 @@ async function loadRoomByEvt(evt){
   return state.room;
 }
 
-
-async function loadRoom(){
+async function loadRoom() {
   console.log('loadRoom()');
   const url = new URL(location.toString());
   let roomId;
@@ -205,175 +201,187 @@ async function loadRoom(){
     console.log('player room: %s', roomId);
   }
   let roomParam = url.searchParams.get('r');
-  if (roomParam){
+  if (roomParam) {
     roomId = roomParam;
     console.log('parameter room: %s', roomId);
   }
   if (!roomId) {
     roomId = state.world.startingRoom;
-    if (!roomId){
+    if (!roomId) {
       console.log('No room set for world %o', state.world);
       return null;
     }
   }
   state.room = await loadRoomById(roomId);
+  console.log('room loaded');
+  state.messages = await loadMessages(roomId);
+  console.log('messages loaded');
 }
 
-async function loadPlayer(worldId, userId){
-  try{
+async function loadPlayer(worldId, userId) {
+  try {
     return (await app.service('characters').find({
       world: worldId,
       user: userId
     })).data[0] || {};
-  }catch(e){
+  } catch (e) {
     console.error("Error loading player: %o", e);
     return null;
   }
 }
 
 async function loadCharacters(worldId) {
-  try{
+  try {
     return (await app.service('characters').find({
       world: worldId
     })).data
-  }catch(e){
-    console.error('Error loading characters: %o, e);
+  } catch (e) {
+    console.error('Error loading characters: %o', e);
     return null;
   }
 }
 
 
-async function loadCurrentUser(){
+async function loadCurrentUser() {
   return (await app.service('users').find({
-    query: {_id: 0}
+    query: { _id: 0 }
   })).currentUser;
 }
 
-async function loadUsers(){
-  try{
+async function loadUsers() {
+  try {
     let users = await app.service('users').find({});
     state.currentUser = users.currentUser;
     users.data.forEach(addUser);
-  }catch(e){
+  } catch (e) {
     console.error('Error listing users: %o', e);
   }
 }
 
-async function loadWorlds(){
-  try{
+async function loadWorlds() {
+  try {
     return (await app.service('worlds').find({
       query: {
         admins: state.currentUser._id
       }
     })).data;
-  }catch(e){
+  } catch (e) {
     console.error('Error listing worlds: %o', e);
     return [];
   }
 }
 
-async function loadPublicWorlds(){
-  try{
+async function loadPublicWorlds() {
+  try {
     return (await app.service('worlds').find({
       query: {
-//        private: false
+        //        private: false
       }
     })).data;
-  }catch(e){
+  } catch (e) {
     console.error('Error listing worlds: %o', e);
     return [];
   }
 }
 
-async function loadAllRooms(){
-  let rooms = (await app.service('rooms').find({
-  })).data;
-  console.log(rooms);
-}
-
-async function loadRooms(worldId){
+async function loadRooms(worldId) {
   try {
-    let rooms = (await app.service('rooms').find({
+    return state.rooms = (await app.service('rooms').find({
       query: {
-        world: state.world._id
+        world: worldId
       }
     })).data;
-    state.rooms = rooms;
-  }catch(e){
-    console.error('Error listing rooms: %o', e)
+  } catch (e) {
+    console.error('Error listing rooms: %o', e);
+    return null;
   }
 }
 
-function loggedOut(response){
+async function loadMessages(roomId) {
+  try {
+    return state.messages = (await app.service('messages').find({
+      query: {
+        room: roomId
+      }
+    })).data;
+  } catch (e) {
+    console.error('Error loading messages: %o', e);
+    return null;
+  }
+}
+
+function loggedOut(response) {
   initState();
 }
 
-function addWorld(world){
+function addWorld(world) {
   state.worlds.push(world);
 }
 
-function addRoom(room){
-  if (!state.world || room.world !== state.world._id){
+function addRoom(room) {
+  if (!state.world || room.world !== state.world._id) {
     return;
   }
   state.rooms.push(room);
 }
 
-function addCharacter(character){
-  if (state.world && character.world === state.world._id){
+function addCharacter(character) {
+  if (state.world && character.world === state.world._id) {
     state.characters.push(character);
   }
 }
 
-function addMessage(message){
-  if (state.room && message.room === state.room._id){
-    state.messages.push();
+function addMessage(message) {
+  console.log('add message: %s', message.text);
+  if (state.room && message.room === state.room._id) {
+    console.log('and it is for us!');
+    state.messages.push(message);
   }
 }
 
-function addUser(user){
+function addUser(user) {
   state.users.push(user);
 }
 
-function addExit(){
+function addExit() {
   state.room.exits.push({
     name: "",
     room: null
   });
 }
 
-function worldForId(id){
-  for (let i = 0; i < state.worlds.length; i++){
-    if (id === state.worlds[i]._id){
+function worldForId(id) {
+  for (let i = 0; i < state.worlds.length; i++) {
+    if (id === state.worlds[i]._id) {
       return state.worlds[i];
     }
   }
   console.error('No world found for id: %s', id);
 }
 
-function roomForId(id){
-  for(let i = 0; i < state.rooms.length; i++){
-    if (id === state.rooms[i]._id){
+function roomForId(id) {
+  for (let i = 0; i < state.rooms.length; i++) {
+    if (id === state.rooms[i]._id) {
       return state.rooms[i];
     }
   }
   console.error('No room found for id: %s', id);
 }
 
-async function chooseWorld(evt){
-  const id = evt.target.value;
-  if (!id){
+async function chooseWorld(evt) {
+  const worldId = evt.target.value;
+  if (!worldId) {
     return;
   }
-  state.world = worldForId(id);
-  loadRooms();
+  state.world = worldForId(worldId);
+  loadRooms(worldId);
 }
 
-function chooseRoom(evt){
+function chooseRoom(evt) {
   state.room = roomForId(evt.target.value);
 }
 
-function newWorld(){
+function newWorld() {
   state.world = {
     name: '',
     summary: '',
@@ -383,7 +391,7 @@ function newWorld(){
   state.rooms = [];
 }
 
-function newRoom(){
+function newRoom() {
   state.room = {
     name: '',
     summary: '',
@@ -396,25 +404,25 @@ function newRoom(){
   };
 }
 
-function showSignup(){
+function showSignup() {
   state.signupp = true;
   state.loginp = false;
 }
 
-function showLogin(){
+function showLogin() {
   state.loginp = true;
   state.signupp = false;
 }
 
-function updatePlayerWorld(world){
+function updatePlayerWorld(world) {
   state.world = world;
 }
 
-function updatePlayerRoom(room){
+function updatePlayerRoom(room) {
   state.room = room;
 }
 
-function updatePlayerCharacter(character){
+function updatePlayerCharacter(character) {
   console.log('updatePlayerCharacter(%s)', character);
   // FIXME: update a character in the array
 }
@@ -424,34 +432,39 @@ function exitRoom(room) {
   console.log('exitRoom(%s)', room);
 }
 
-function sendMessage(evt) {
-  // FIXME
+async function sendMessage(evt) {
   evt.preventDefault();
-  let message = evt.target.firstElementChild.value;
-  await app.service('messsages').create({
+  const input = evt.target.firstElementChild;
+  let message = input.value;
+  input.value = '';
+  console.log("{%s, %s, %s, %s}", message, state.player.name, state.player._id, state.room._id);
+  await app.service('messages').create({
     text: message,
     name: state.player.name,
-    player: state.player._id
+    player: state.player._id,
+    room: state.room._id
   });
+  console.log('message sent');
 }
 
-function formatDate(timestamp){
+function formatDate(timestamp) {
   return new Date(timestamp).toLocaleString();
 }
 
-function characterName(id){
-  for (let i = 0; i < state.characters.length; i++){
-    if (state.characters[i]._id === id){
+function characterName(id, name) {
+  // name is the name at the time the message was saved, but may have changed since then
+  for (let i = 0; i < state.characters.length; i++) {
+    if (state.characters[i]._id === id) {
       return state.characters[i].name;
     }
   }
-  return "No name found for " + id;
+  return name;
 }
 
 
 // Data listeners
 
-function initWizardListeners(){
+function initWizardListeners() {
   app.service('worlds').on('created', addWorld);
   app.service('rooms').on("created", addRoom);
   app.service('users').on("created", addUser);
@@ -461,7 +474,7 @@ function initWizardListeners(){
   app.on('reauthentication-error', login);
 }
 
-function initPlayerListeners(){
+function initPlayerListeners() {
   app.service('worlds').on('updated', updatePlayerWorld);
   app.service('rooms').on('updated', updatePlayerRoom);
   app.service('characters').on('updated', updatePlayerCharacter);
@@ -475,7 +488,7 @@ function initPlayerListeners(){
   app.on('reauthentication-error', login);
 }
 
-function initLoginUI(){
+function initLoginUI() {
   const uinav = new Vue({
     el: "#nav",
     data: state,
@@ -487,7 +500,19 @@ function initLoginUI(){
   });
 }
 
-function initWizardUI(){
+function path(world, room){
+  if (world && world._id && room && room._id){
+    return `/?w=${world._id}&r=${room._id}`;
+  }else if (world && world._id){
+    return `/?w=${world._id}`;
+  }else if (room && room._id){
+    return `/?r=${room._id}`;
+  }else{
+    return '/';
+  }
+}
+
+function initWizardUI() {
   const uimain = new Vue({
     el: "#main",
     data: state,
@@ -501,12 +526,12 @@ function initWizardUI(){
       newWorld: evt => newWorld(),
       newRoom: evt => newRoom(),
       addExit: evt => addExit(),
-      path: (world, room) => `/?w=${world._id}&r=${room._id}`
+      path: (world, room) => path(world, room)
     }
   });
 }
 
-function initPlayerUI(){
+function initPlayerUI() {
   const uimain = new Vue({
     el: '#main',
     data: state,
@@ -521,12 +546,12 @@ function initPlayerUI(){
       savePlayer: evt => savePlayer(evt),
       characterName: id => characterName(id),
       formatDate: timestamp => formatDate(timestamp),
-      path: room => `/?&r=${room._id}`
+      path: room => path(null, room)
     }
   });
 }
 
-function initWizard(){
+function initWizard() {
   initFeathers();
   initWizardState();
   initWizardListeners();
@@ -535,7 +560,7 @@ function initWizard(){
   login();
 }
 
-function initFool(){
+function initFool() {
   initFeathers();
   initFoolState();
   initFoolListeners();
@@ -544,7 +569,7 @@ function initFool(){
   login();
 }
 
-function initPlayer(){
+function initPlayer() {
   initFeathers();
   initPlayerState();
   initPlayerListeners();
@@ -553,10 +578,10 @@ function initPlayer(){
   login();
 }
 
-if (location.pathname.includes('wizard')){
+if (location.pathname.includes('wizard')) {
   initWizard();
-}else if (location.pathname.includes('fool')){
+} else if (location.pathname.includes('fool')) {
   initFool();
-}else{
+} else {
   initPlayer();
 }
