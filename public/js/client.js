@@ -437,17 +437,22 @@ async function sendMessage(evt) {
   const input = evt.target.firstElementChild;
   let message = input.value;
   input.value = '';
+  await saveMessage(message);
+}
+
+async function saveMessage(message) {
   console.log("{%s, %s, %s, %s}", message, state.player.name, state.player._id, state.room._id);
-  await app.service('messages').create({
+  let savedMessage = await app.service('messages').create({
     text: message,
     name: state.player.name,
     player: state.player._id,
     room: state.room._id
   });
-  console.log('message sent');
+  console.log('message sent: %s', JSON.stringify(savedMessage));
 }
 
 function formatDate(timestamp) {
+  console.log('timestamp: %s', timestamp);
   return new Date(timestamp).toLocaleString();
 }
 
@@ -500,14 +505,14 @@ function initLoginUI() {
   });
 }
 
-function path(world, room){
-  if (world && world._id && room && room._id){
+function path(world, room) {
+  if (world && world._id && room && room._id) {
     return `/?w=${world._id}&r=${room._id}`;
-  }else if (world && world._id){
+  } else if (world && world._id) {
     return `/?w=${world._id}`;
-  }else if (room && room._id){
+  } else if (room && room._id) {
     return `/?r=${room._id}`;
-  }else{
+  } else {
     return '/';
   }
 }

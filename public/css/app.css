@@ -2,7 +2,18 @@
 
 aside{
     height: 100%;
+    font-size: 1em;
+    font-style: normal;
+    color: #000;
 }
 iframe{
     height: 100%;
+}
+
+blockquote{
+    padding-left: 0;
+}
+
+cite{
+    font-size: 0.8em;
 }

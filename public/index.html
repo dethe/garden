@@ -37,12 +37,13 @@
 <aside id="chat" style="background-color: cornsilk">
     <template v-if="room">
         <h3>Chat</h3>
+        <hr>
         <div class="scrolldiv">
             <template v-for="message in messages">
                 <blockquote>
                     {{message.text}}
                 </blockquote>
-                <cite>{{characterName(message.player, message.name)}} <small>{{formatDate(message.createdOn)}}</small></cite>
+                <cite>{{characterName(message.player, message.name)}} <small>{{formatDate(message.createdAt)}}</small></cite>
             </template>
         </div>
         <form @submit="sendMessage">
