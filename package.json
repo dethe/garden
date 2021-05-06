@@ -47,7 +47,7 @@
     "feathers-nedb": "^4.0.1",
     "helmet": "^3.15.0",
     "nedb": "^1.8.0",
-    "sanitize-html": "^1.20.0",
+    "sanitize-html": "^2.3.2",
     "serve-favicon": "^2.5.0",
     "winston": "^3.2.1"
   },
